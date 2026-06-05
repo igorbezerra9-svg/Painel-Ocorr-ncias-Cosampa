@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="60">
+
 <title>Cosampa — Acompanhamento de Ocorrências Emergenciais</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -399,6 +399,195 @@ function toggleTheme(){
 })();
 
 renderTudo();
+</script>
+
+<script>
+// ── Polling em tempo real ─────────────────────────────────────────
+const DADOS_URL = 'https://igorbezerra9-svg.github.io/Painel-Ocorr-ncias-Cosampa/dados.json';
+let ultimoAtualizado = null;
+
+const URGENTES_SET = new Set(['PERIGO IMINENTE','INCÊNDIO','CONDUTOR (FIO) PARTIDO','FALTA EM CLIENTE VITAL']);
+const AREA_COR = {'MILAGRES':'#10b981','CRATO':'#f97316','C. SALES':'#f59e0b','JUAZEIRO':'#3b82f6','ICO':'#8b5cf6'};
+const COSAMPA_PROC = {
+  'CPS-TR-11B':'em','CPR-RD-12B':'em','CPN-RD-13B':'em','CPF-RD-14B':'em',
+  'CPB-RD-15B':'em','CPE-RD-16B':'em','CPE-RD-12C':'em','CPN-RD-13C':'em',
+  'CPS-TR-11C':'em','CPR-RD-14D':'em','CPN-RD-12D':'em','CPA-RD-13D':'em',
+  'JZN-RD-19C':'em','JZB-RD-16C':'em','JZN-SK-11C':'em','JZN-RD-17C':'em',
+  'JZN-RD-16C':'em','JZN-RD-13D':'em','JZN-RD-15D':'em','JZN-RD-10C':'em',
+  'JZC-RD-14D':'em','JZC-RD-12C':'em','JZN-RD-10B':'em','JZN-RD-11B':'em',
+  'JZN-RD-22B':'em','JZN-RD-15B':'em','JZB-RD-16B':'em','JZN-SK-11B':'em',
+  'JZN-RD-28B':'em','JZU-RD-14B':'em','JZC-RD-17B':'em','JZC-RD-18B':'em',
+  'JZN-MP-11B':'em','JZN-RD-27B':'em',
+  'MLG-TR-11B':'em','MLV-RD-12B':'em','MLS-RD-15B':'em','MLM-RD-16B':'em',
+  'MLJ-RD-17B':'em','MLP-RD-18B':'em','MLB-RD-13B':'em','MLG-TR-11C':'em',
+  'MLS-RD-12C':'em','MLB-RD-13C':'em','MLM-RD-14C':'em','MLV-RD-16C':'em',
+  'MLG-RD-14B':'em','MLB-RD-15D':'em',
+  'CPS-LB-11B':'co','CPR-LB-12B':'co','CPE-LB-13B':'co','CPB-LB-14B':'co',
+  'CPS-MM-11B':'co','CPP-MM-13B':'co','CPE-MM-14B':'co','CPB-MM-15B':'co',
+  'JZN-LB-12B':'co','JZN-LB-13B':'co','JZN-LB-14B':'co','JZN-LB-15B':'co',
+  'JZN-LB-17B':'co','JZC-LB-20B':'co','JZC-LB-21B':'co','JZC-LB-22B':'co',
+  'CPN-LB-28B':'co','JZN-LB-11B':'co','JZN-LB-18B':'co','JZN-LB-19B':'co',
+  'JZB-LB-23B':'co','JZB-LB-24B':'co','JZB-LB-25B':'co','MLJ-LB-16B':'co',
+  'JZU-LB-26B':'co','JZN-GA-11B':'co',
+  'JZN-MM-13B':'co','JZN-MM-14B':'co','JZN-MM-15B':'co','JZN-MM-21B':'co',
+  'JZN-MM-23B':'co','JZC-MM-11B':'co','JZC-MM-17B':'co','JZB-MM-16B':'co',
+  'JZB-MM-22B':'co','MLJ-MM-12B':'co','JZU-MM-19B':'co','CPN-MM-18B':'co',
+  'CPF-MM-24B':'co','JZN-MM-12B':'co',
+  'MLG-LB-11B':'co','MLV-LB-12B':'co','MLV-LB-13B':'co','MLS-LB-14B':'co',
+  'MLM-LB-18B':'co','MLA-LB-16B':'co','MLP-LB-19B':'co',
+  'MLG-MM-11B':'co','MLV-MM-12B':'co','MLS-MM-13B':'co','MLM-MM-14B':'co',
+  'MLA-MM-15B':'co','MLP-MM-16B':'co',
+  'CPS-MP-11B':'ml','CPS-LV-11B':'ml','JZN-ML-11B':'ml','JZN-LV-11B':'ml',
+  'JZN-LV-12B':'ml','JZN-LV-11R':'ml','JZN-LV-12R':'ml','MLG-ML-11B':'ml',
+  'MLG-MP-11B':'ml','MLG-LV-11B':'ml',
+};
+
+function durMin(d){const p=d.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+
+function vtrTag(v, small=false){
+  if(!v) return '<span style="font-size:10.5px;color:var(--orange)">⚠ sem equipe</span>';
+  const p=COSAMPA_PROC[v];
+  const cls=p==='em'?'vtr-em':p==='co'?'vtr-co':p==='ml'?'vtr-ml':'vtr-el';
+  const title=p==='em'?'Cosampa Emergencial':p==='co'?'Cosampa Comercial':p==='ml'?'Cosampa Manutenção':'Enel / não identificada';
+  const sz=small?'font-size:9.5px;padding:1px 6px;':'';
+  return `<span class="vtr ${cls}" style="${sz}" title="${title}">${v}</span>`;
+}
+
+function atualizarPainel(payload){
+  const dados = payload.dados;
+  const agora = payload.atualizado;
+  const total = dados.length;
+  const cli   = dados.reduce((s,d)=>s+parseInt(d.cli||0),0);
+  const sv    = dados.filter(d=>!d.vtr).length;
+  const urg   = dados.filter(d=>URGENTES_SET.has(d.tipo)).length;
+  const rec   = dados.filter(d=>d.est==='RECEBIDA').length;
+  const nova  = dados.filter(d=>d.est==='NOVA').length;
+  const pctSv = total?Math.round(sv*100/total):0;
+
+  // Cards métricas
+  document.querySelector('.met.met-blue .met-num').textContent = total;
+  document.querySelector('.met.met-blue .met-sub').textContent = `${rec} recebidas · ${nova} novas`;
+  document.querySelector('.met.met-muted .met-num').textContent = cli.toLocaleString('pt-BR');
+  document.querySelector('.met.met-orange .met-num').textContent = sv;
+  document.querySelector('.met.met-orange .met-sub').textContent = `${pctSv}% ainda sem equipe`;
+  document.querySelector('.met.met-red .met-num').textContent = urg;
+
+  // Pills urgentes
+  const urgDados = dados.filter(d=>URGENTES_SET.has(d.tipo)).slice(0,4);
+  document.querySelector('.urg-pills').innerHTML = urgDados
+    .map(d=>`<span class="urg-pill">${d.tipo} · ${d.area}</span>`).join('');
+
+  // Áreas
+  const areaCount={}, areaCli={};
+  dados.forEach(d=>{
+    areaCount[d.area]=(areaCount[d.area]||0)+1;
+    areaCli[d.area]=(areaCli[d.area]||0)+parseInt(d.cli||0);
+  });
+  const AREA_MAP={'C. SALES':'Campos Sales','MILAGRES':'Milagres','JUAZEIRO':'Juazeiro do Norte','CRATO':'Crato','ICO':'Icó'};
+  document.querySelectorAll('.area').forEach(card=>{
+    const nome=card.querySelector('.area-name').textContent.trim();
+    const key=Object.keys(AREA_MAP).find(k=>AREA_MAP[k]===nome);
+    if(!key) return;
+    const cnt=areaCount[key]||0;
+    const c=areaCli[key]||0;
+    card.querySelector('.area-num').textContent=cnt;
+    const vals=card.querySelectorAll('.area-val');
+    if(vals[0]) vals[0].textContent=cnt;
+    if(vals[1]) vals[1].textContent=c;
+  });
+
+  // Equipes em campo
+  const vtrs=[...new Set(dados.filter(d=>d.vtr).map(d=>d.vtr))];
+  const nEm=vtrs.filter(v=>COSAMPA_PROC[v]==='em').length;
+  const nCo=vtrs.filter(v=>['co','ml'].includes(COSAMPA_PROC[v])).length;
+  const nEl=vtrs.filter(v=>!COSAMPA_PROC[v]).length;
+  const tot=vtrs.length;
+  const pEm=tot?Math.round(nEm*100/tot):0;
+  const pCo=tot?Math.round(nCo*100/tot):0;
+  const pEl=100-pEm-pCo;
+  const elIds=vtrs.filter(v=>!COSAMPA_PROC[v]).join(' · ');
+
+  document.querySelector('.eq-total').textContent=`${tot} viaturas em atendimento`;
+  const segs=document.querySelectorAll('.eq-seg');
+  if(segs[0]) segs[0].style.width=pEm+'%';
+  if(segs[1]) segs[1].style.width=pCo+'%';
+  if(segs[2]) segs[2].style.width=pEl+'%';
+
+  const items=document.querySelectorAll('.eq-item');
+  if(items[0]){items[0].querySelector('.eq-num').textContent=nEm;items[0].querySelector('.eq-pct').textContent=pEm+'%';}
+  if(items[1]){items[1].querySelector('.eq-num').textContent=nCo;items[1].querySelector('.eq-pct').textContent=pCo+'%';}
+  if(items[2]){
+    items[2].querySelector('.eq-num').textContent=nEl;
+    items[2].querySelector('.eq-pct').textContent=pEl+'%';
+    const eids=items[2].querySelector('.eq-enel-ids');
+    if(eids) eids.textContent=elIds;
+  }
+  document.querySelector('.vtr-row').innerHTML=vtrs.map(v=>vtrTag(v)).join('\n');
+
+  // Tabela
+  window._dadosAtuais = dados;
+  renderTabelaLive(filtroAtivo||'Todas');
+
+  // Horário
+  const ht=document.getElementById('hdr-time');
+  if(ht) ht.textContent=agora;
+}
+
+function renderTabelaLive(area){
+  const lista=area==='Todas'?window._dadosAtuais:(window._dadosAtuais||[]).filter(d=>d.area===area);
+  const count=document.getElementById('tbl-count');
+  if(count) count.textContent=lista.length;
+  const tbody=document.getElementById('tbody');
+  if(!tbody) return;
+  tbody.innerHTML=lista.map(d=>{
+    const urg=URGENTES_SET.has(d.tipo);
+    const longa=durMin(d.dur)>120;
+    const badge=d.est==='NOVA'?'bdg-n':'bdg-r';
+    const cor=AREA_COR[d.area]||'#888';
+    const av=parseInt(d.av)||0;
+    return `<tr class="${urg?'urg':''}">
+      <td class="mono">${d.id}</td>
+      <td><span class="bdg ${badge}">${d.est}</span></td>
+      <td><span class="adot" style="background:${cor}"></span><span style="font-size:11.5px">${d.area}</span></td>
+      <td class="${longa?'dur-hi':'dur-ok'}">${d.dur}</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:11.5px">${d.cli||'—'}</td>
+      <td style="text-align:center"><span class="${av>=5?'av-hi':'av-ok'}">${d.av}</span></td>
+      <td class="trunc" style="font-size:11.5px${urg?';color:var(--red);font-weight:500':''}">
+        ${urg?'⚠ ':''}${d.tipo}</td>
+      <td>${vtrTag(d.vtr,true)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Sobrescreve filtrar para usar dados ao vivo
+function filtrar(area){
+  filtroAtivo=area;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('on',
+    b.textContent.trim()===(area==='Todas'?'Todas':area==='C. SALES'?'C. Sales':
+    area.charAt(0)+area.slice(1).toLowerCase())));
+  renderTabelaLive(area);
+}
+
+let filtroAtivo='Todas';
+
+async function buscarDados(){
+  try{
+    const res = await fetch(DADOS_URL+'?t='+Date.now());
+    if(!res.ok) return;
+    const payload = await res.json();
+    if(payload.atualizado !== ultimoAtualizado){
+      ultimoAtualizado = payload.atualizado;
+      atualizarPainel(payload);
+      console.log('[✓] Painel atualizado:', payload.atualizado);
+    }
+  }catch(e){
+    console.warn('[!] Erro ao buscar dados:', e);
+  }
+}
+
+// Busca imediatamente e depois a cada 30 segundos
+buscarDados();
+setInterval(buscarDados, 30000);
 </script>
 </body>
 </html>
