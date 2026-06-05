@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="120">
+<title>SGT Monitor — GER DIST. SUL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--s1:#131620;--s2:#1a1e2e;--border:rgba(255,255,255,0.06);--text:#e2e4ed;--muted:#5a6178;--muted2:#7c849e;--red:#ef4444;--orange:#f59e0b;--blue:#3b82f6;--green:#10b981;--purple:#8b5cf6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:13px}
+.hdr{background:var(--s1);border-bottom:1px solid var(--border);padding:.75rem 1.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.hdr-l{display:flex;align-items:center;gap:9px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:ping 2s infinite;flex-shrink:0}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}70%{box-shadow:0 0 0 7px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.hdr-title{font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+.hdr-sub{font-size:11px;color:var(--muted2)}
+.chip-live{font-size:9.5px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);text-transform:uppercase}
+.hdr-time{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace}
+.wrap{padding:1.25rem 1.75rem;max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.met{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;position:relative;overflow:hidden;transition:border-color .2s}
+.met:hover{border-color:rgba(255,255,255,0.12)}
+.met::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.met-blue::before{background:var(--blue)}.met-red::before{background:var(--red)}
+.met-orange::before{background:var(--orange)}.met-muted::before{background:var(--muted)}
+.met-num{font-size:30px;font-weight:200;line-height:1;letter-spacing:-.02em;margin-bottom:3px}
+.met-blue .met-num{color:#93c5fd}.met-red .met-num{color:var(--red)}
+.met-orange .met-num{color:var(--orange)}.met-muted .met-num{color:var(--muted2)}
+.met-label{font-size:11px;color:var(--muted2)}.met-sub{font-size:10px;color:var(--muted);margin-top:4px}
+.urg-pills{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.urg-pill{font-size:9.5px;padding:1px 6px;border-radius:3px;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.2);white-space:nowrap}
+.eq-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:.9rem 1.1rem}
+.eq-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.eq-title{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
+.eq-total{font-size:10.5px;color:var(--muted);font-family:'DM Mono',monospace}
+.eq-barra{height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;display:flex;margin-bottom:8px}
+.eq-seg{height:100%}
+.eq-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.eq-item{display:flex;align-items:center;gap:6px;font-size:11.5px}
+.eq-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.eq-num{font-weight:600}.eq-lbl{color:var(--muted2)}.eq-pct{font-size:10px;color:var(--muted);margin-left:2px}
+.eq-enel-ids{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-left:4px}
+.divider{height:1px;background:var(--border);margin-bottom:8px}
+.vtr-row{display:flex;flex-wrap:wrap;gap:4px}
+.vtr{font-size:10px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:4px;border:1px solid;cursor:default}
+.vtr-em{background:rgba(59,130,246,0.1);color:#93c5fd;border-color:rgba(59,130,246,0.22)}
+.vtr-co{background:rgba(16,185,129,0.1);color:#6ee7b7;border-color:rgba(16,185,129,0.22)}
+.vtr-ml{background:rgba(245,158,11,0.1);color:#fcd34d;border-color:rgba(245,158,11,0.22)}
+.vtr-el{background:rgba(107,114,128,0.1);color:#9ca3af;border-color:rgba(107,114,128,0.18)}
+.areas{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.area{background:var(--s1);border:1px solid var(--border);border-top-width:2px;border-radius:8px;padding:.75rem 1rem}
+.area-num{font-size:26px;font-weight:200;line-height:1;margin-bottom:1px}
+.area-name{font-size:10.5px;color:var(--muted2);font-weight:500;margin-bottom:5px}
+.area-row{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:2px}
+.area-val{font-family:'DM Mono',monospace;font-size:10.5px}
+.tbl-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tbl-top{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.1rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.tbl-label{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
+.tbl-count{font-size:10.5px;font-family:'DM Mono',monospace;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--muted2);margin-left:8px}
+.filters{display:flex;gap:4px;flex-wrap:wrap}
+.fbtn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.fbtn:hover{color:var(--text);border-color:rgba(255,255,255,0.14)}.fbtn.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:500}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{border-bottom:1px solid var(--border)}
+th{padding:7px 11px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);transition:background .1s}
+tbody tr:hover{background:rgba(255,255,255,0.025)}
+tbody tr:last-child{border-bottom:none}
+tbody tr.urg{background:rgba(239,68,68,0.06)}
+tbody tr.urg:hover{background:rgba(239,68,68,0.1)}
+td{padding:7px 11px;vertical-align:middle}
+.bdg{font-size:9.5px;padding:1px 6px;border-radius:3px;font-weight:700;letter-spacing:.03em;display:inline-block}
+.bdg-n{background:rgba(59,130,246,0.12);color:#93c5fd;border:1px solid rgba(59,130,246,0.22)}
+.bdg-r{background:rgba(16,185,129,0.1);color:#6ee7b7;border:1px solid rgba(16,185,129,0.2)}
+.adot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+.dur-ok{font-family:'DM Mono',monospace;font-size:11.5px}
+.dur-hi{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--red);font-weight:500}
+.trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:185px}
+.mono{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted2)}
+.no-eq{font-size:10.5px;color:var(--orange)}
+.av-hi{color:var(--orange);font-weight:600;font-family:'DM Mono',monospace}
+.av-ok{font-family:'DM Mono',monospace;color:var(--muted2)}
+.vtag{font-size:9.5px;font-family:'DM Mono',monospace;padding:1px 6px;border-radius:3px;border:1px solid}
+@media(max-width:900px){.metrics,.areas{grid-template-columns:repeat(2,1fr)}.wrap{padding:.9rem}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="pulse"></div>
+    <div>
+      <div class="hdr-title">SGT — Panorama Emergencial Sul</div>
+      <div class="hdr-sub">GER DIST. SUL / DESUL</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="chip-live">● ao vivo</span>
+    <span class="hdr-time" id="hdr-time">04/06/2026 21:39:21</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="metrics">
+    <div class="met met-blue">
+      <div class="met-num" id="m-total">—</div>
+      <div class="met-label">Incidências ativas</div>
+      <div class="met-sub" id="m-total-sub"></div>
+    </div>
+    <div class="met met-muted">
+      <div class="met-num" id="m-cli">—</div>
+      <div class="met-label">Clientes afetados</div>
+    </div>
+    <div class="met met-orange">
+      <div class="met-num" id="m-sv">—</div>
+      <div class="met-label">Aguardando viatura</div>
+      <div class="met-sub" id="m-sv-sub"></div>
+    </div>
+    <div class="met met-red">
+      <div class="met-num" id="m-urg">—</div>
+      <div class="met-label">Urgentes / risco de vida</div>
+      <div class="urg-pills" id="urg-pills"></div>
+    </div>
+  </div>
+
+  <div class="eq-card">
+    <div class="eq-top">
+      <span class="eq-title">Equipes em campo agora</span>
+      <span class="eq-total" id="eq-total">—</span>
+    </div>
+    <div class="eq-barra" id="eq-barra"></div>
+    <div class="eq-legend" id="eq-legend"></div>
+    <div class="divider"></div>
+    <div class="vtr-row" id="vtr-row"></div>
+  </div>
+
+  <div class="areas" id="areas-grid"></div>
+
+  <div class="tbl-card">
+    <div class="tbl-top">
+      <div style="display:flex;align-items:center">
+        <span class="tbl-label">Incidências ativas</span>
+        <span class="tbl-count" id="tbl-count">—</span>
+      </div>
+      <div class="filters" id="filters"></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Nº Incidência</th><th>Estado</th><th>Área</th>
+          <th>Duração</th><th style="text-align:right">Clientes</th>
+          <th style="text-align:center">Avisos</th>
+          <th>Tipo</th><th>Viatura</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// Dados preenchidos pelo Python (sgt_monitor.py)
+const dados=[{"id": "0041267863", "est": "NOVA", "area": "CRATO", "dur": "12:22", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041268123", "est": "RECEBIDA", "area": "CRATO", "dur": "11:39", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZC-RD-12C"}, {"id": "0041268927", "est": "RECEBIDA", "area": "MILAGRES", "dur": "9:56", "cli": "0", "av": "1", "tipo": "TROCA DE DISJUNTOR", "vtr": "MLG-TR-11C"}, {"id": "0041269587", "est": "RECEBIDA", "area": "MILAGRES", "dur": "8:11", "cli": "72", "av": "6", "tipo": "VEGETACAO SOBRE A REDE", "vtr": "MLM-RD-14C"}, {"id": "0041269857", "est": "RECEBIDA", "area": "MILAGRES", "dur": "7:21", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLM-RD-14C"}, {"id": "0041270077", "est": "RECEBIDA", "area": "MILAGRES", "dur": "6:48", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11C"}, {"id": "0041270117", "est": "RECEBIDA", "area": "C. SALES", "dur": "6:42", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPN-RD-12D"}, {"id": "0041270409", "est": "RECEBIDA", "area": "MILAGRES", "dur": "5:58", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "MLM-RD-14C"}, {"id": "0041270841", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "4:52", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-RD-16C"}, {"id": "0041270871", "est": "NOVA", "area": "MILAGRES", "dur": "4:46", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041270941", "est": "RECEBIDA", "area": "MILAGRES", "dur": "4:34", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLB-RD-13C"}, {"id": "0041271139", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "4:07", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "JZN-RD-10C"}, {"id": "0041271169", "est": "NOVA", "area": "CRATO", "dur": "4:03", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041271211", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:57", "cli": "1", "av": "3", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-RD-10C"}, {"id": "0041271329", "est": "RECEBIDA", "area": "CRATO", "dur": "3:36", "cli": "1", "av": "4", "tipo": "INCÊNDIO", "vtr": "JZC-RD-12C"}, {"id": "0041271331", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:35", "cli": "344", "av": "8", "tipo": "OSCILACAO", "vtr": "JZN-RD-17C"}, {"id": "0041271349", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:34", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "JZN-SK-11C"}, {"id": "0041271493", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:06", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-RD-17C"}, {"id": "0041271509", "est": "NOVA", "area": "MILAGRES", "dur": "3:03", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041271607", "est": "NOVA", "area": "C. SALES", "dur": "2:46", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": ""}, {"id": "0041271725", "est": "NOVA", "area": "JUAZEIRO", "dur": "2:24", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": ""}, {"id": "0041271829", "est": "NOVA", "area": "CRATO", "dur": "1:51", "cli": "1", "av": "3", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041271867", "est": "NOVA", "area": "CRATO", "dur": "1:42", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041271919", "est": "NOVA", "area": "CRATO", "dur": "1:27", "cli": "1", "av": "2", "tipo": "INCÊNDIO", "vtr": ""}, {"id": "0041271949", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:20", "cli": "203", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041272001", "est": "NOVA", "area": "CRATO", "dur": "1:08", "cli": "15", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041272099", "est": "NOVA", "area": "C. SALES", "dur": "0:43", "cli": "6", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041272227", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:13", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}];
+
+const AREA_COR = {'MILAGRES':'#10b981','CRATO':'#f97316','C. SALES':'#f59e0b','JUAZEIRO':'#3b82f6','ICO':'#8b5cf6'};
+const AREA_NUM_COR = {'MILAGRES':'#6ee7b7','CRATO':'#fdba74','C. SALES':'#fcd34d','JUAZEIRO':'#93c5fd','ICO':'#c4b5fd'};
+const AREA_LABEL = {'MILAGRES':'Milagres','CRATO':'Crato','C. SALES':'Campos Sales','JUAZEIRO':'Juazeiro do Norte','ICO':'Icó'};
+const AREAS_ORDER = ['C. SALES','MILAGRES','JUAZEIRO','CRATO','ICO'];
+const URGENTES = ['PERIGO IMINENTE','INCENDIO','INCÊNDIO','CONDUTOR (FIO) PARTIDO','FALTA EM CLIENTE VITAL','FIO PARTIDO'];
+
+function classeVtr(v) {
+  if (!v) return null;
+  if (/-EX-/.test(v)) return 'el';
+  if (/-ML-/.test(v)) return 'ml';
+  if (/-LB-/.test(v)) return 'co';
+  return 'em';
+}
+function durMin(d) {
+  var p = (d || '0:0').split(':');
+  return parseInt(p[0] || 0) * 60 + parseInt(p[1] || 0);
+}
+function fmtCli(n) { return (parseInt(n) || 0).toLocaleString('pt-BR'); }
+
+var filtroAtivo = 'Todas';
+
+function renderMetricas() {
+  var total = dados.length;
+  var rec   = dados.filter(function(d){ return d.est === 'RECEBIDA'; }).length;
+  var nova  = dados.filter(function(d){ return d.est === 'NOVA'; }).length;
+  var cli   = dados.reduce(function(s,d){ return s + (parseInt(d.cli) || 0); }, 0);
+  var sv    = dados.filter(function(d){ return !d.vtr; }).length;
+  var pctSv = total ? Math.round(sv / total * 100) : 0;
+  var urgList = dados.filter(function(d){
+    return URGENTES.some(function(u){ return (d.tipo || '').toUpperCase().indexOf(u) >= 0; });
+  });
+  document.getElementById('m-total').textContent = total;
+  document.getElementById('m-total-sub').textContent = rec + ' recebidas · ' + nova + ' novas';
+  document.getElementById('m-cli').textContent = fmtCli(cli);
+  document.getElementById('m-sv').textContent = sv;
+  document.getElementById('m-sv-sub').textContent = pctSv + '% ainda sem equipe';
+  document.getElementById('m-urg').textContent = urgList.length;
+  document.getElementById('urg-pills').innerHTML = urgList.map(function(d){
+    return '<span class="urg-pill">' + d.tipo.replace('CONDUTOR (FIO) PARTIDO','FIO PARTIDO') + ' · ' + d.area + '</span>';
+  }).join('');
+}
+
+function renderEquipes() {
+  var seen = {};
+  var viaturas = dados.map(function(d){ return d.vtr; }).filter(function(v){
+    if (!v || seen[v]) return false; seen[v] = true; return true;
+  });
+  var grupos = {em:[], co:[], ml:[], el:[]};
+  viaturas.forEach(function(v){ var c = classeVtr(v); if (c) grupos[c].push(v); });
+  var tot = viaturas.length;
+  document.getElementById('eq-total').textContent = tot + ' viatura' + (tot !== 1 ? 's' : '') + ' em atendimento';
+  var cfg = [
+    {k:'em', label:'Cosampa Emergencial',      cor:'var(--red)',    numCor:'#fca5a5'},
+    {k:'co', label:'Cosampa Comercial/Outros', cor:'var(--green)',  numCor:'#6ee7b7'},
+    {k:'ml', label:'Cosampa Manutenção Leve',  cor:'var(--orange)', numCor:'#fcd34d'},
+    {k:'el', label:'Enel / não identificada',  cor:'var(--muted)',  numCor:'#9ca3af'}
+  ].filter(function(c){ return grupos[c.k].length > 0; });
+  document.getElementById('eq-barra').innerHTML = cfg.map(function(c){
+    var pct = tot ? Math.round(grupos[c.k].length / tot * 100) : 0;
+    return '<div class="eq-seg" style="width:' + pct + '%;background:' + c.cor + ';opacity:.85"></div>';
+  }).join('');
+  document.getElementById('eq-legend').innerHTML = cfg.map(function(c){
+    var n = grupos[c.k].length, pct = tot ? Math.round(n / tot * 100) : 0;
+    var ids = c.k === 'el' ? '<span class="eq-enel-ids">' + grupos[c.k].join(' · ') + '</span>' : '';
+    return '<div class="eq-item"><div class="eq-dot" style="background:' + c.cor + '"></div>' +
+      '<span class="eq-num" style="color:' + c.numCor + '">' + n + '</span>' +
+      '<span class="eq-lbl">' + c.label + '</span><span class="eq-pct">' + pct + '%</span>' + ids + '</div>';
+  }).join('');
+  var clsMap = {em:'vtr-em', co:'vtr-co', ml:'vtr-ml', el:'vtr-el'};
+  document.getElementById('vtr-row').innerHTML = viaturas.map(function(v){
+    return '<span class="vtr ' + (clsMap[classeVtr(v)] || 'vtr-el') + '">' + v + '</span>';
+  }).join('');
+}
+
+function renderAreas() {
+  var cnt = {}, cliArea = {};
+  dados.forEach(function(d){
+    cnt[d.area] = (cnt[d.area] || 0) + 1;
+    cliArea[d.area] = (cliArea[d.area] || 0) + (parseInt(d.cli) || 0);
+  });
+  var areas = AREAS_ORDER.filter(function(a){ return cnt[a]; });
+  Object.keys(cnt).forEach(function(a){ if (areas.indexOf(a) < 0) areas.push(a); });
+  document.getElementById('areas-grid').innerHTML = areas.map(function(a){
+    var cor    = AREA_COR[a]     || '#888';
+    var numCor = AREA_NUM_COR[a] || '#aaa';
+    var label  = AREA_LABEL[a]   || a;
+    return '<div class="area" style="border-top-color:' + cor + '">' +
+      '<div class="area-num" style="color:' + numCor + '">' + cnt[a] + '</div>' +
+      '<div class="area-name">' + label + '</div>' +
+      '<div class="area-row"><span>Incidências</span><span class="area-val" style="color:' + numCor + '">' + cnt[a] + '</span></div>' +
+      '<div class="area-row"><span>Clientes</span><span class="area-val">' + fmtCli(cliArea[a]) + '</span></div></div>';
+  }).join('');
+}
+
+function renderFiltros() {
+  var seen = {}, areas = [];
+  dados.forEach(function(d){ if (d.area && !seen[d.area]) { seen[d.area] = true; areas.push(d.area); } });
+  areas.sort();
+  document.getElementById('filters').innerHTML = ['Todas'].concat(areas).map(function(a){
+    var label = a === 'Todas' ? 'Todas' : (AREA_LABEL[a] || a);
+    var cls = a === filtroAtivo ? ' on' : '';
+    return '<button class="fbtn' + cls + '" onclick="filtrar(\'' + a + '\')">' + label + '</button>';
+  }).join('');
+}
+
+function renderTabela() {
+  var lista = filtroAtivo === 'Todas' ? dados : dados.filter(function(d){ return d.area === filtroAtivo; });
+  document.getElementById('tbl-count').textContent = lista.length;
+  var clsMap = {em:'vtr-em', co:'vtr-co', ml:'vtr-ml', el:'vtr-el'};
+  document.getElementById('tbody').innerHTML = lista.map(function(d){
+    var urg   = URGENTES.some(function(u){ return (d.tipo || '').toUpperCase().indexOf(u) >= 0; });
+    var longa = durMin(d.dur) > 120;
+    var badge = d.est === 'NOVA' ? 'bdg-n' : 'bdg-r';
+    var cor   = AREA_COR[d.area] || '#888';
+    var cls   = classeVtr(d.vtr);
+    var vtrHtml = d.vtr
+      ? '<span class="vtag ' + (clsMap[cls] || 'vtr-el') + '">' + d.vtr + '</span>'
+      : '<span class="no-eq">&#9888; sem equipe</span>';
+    var av = parseInt(d.av) || 0;
+    return '<tr class="' + (urg ? 'urg' : '') + '">' +
+      '<td class="mono">' + d.id + '</td>' +
+      '<td><span class="bdg ' + badge + '">' + d.est + '</span></td>' +
+      '<td><span class="adot" style="background:' + cor + '"></span><span style="font-size:11.5px">' + d.area + '</span></td>' +
+      '<td class="' + (longa ? 'dur-hi' : 'dur-ok') + '">' + d.dur + '</td>' +
+      '<td style="text-align:right;font-family:\'DM Mono\',monospace;font-size:11.5px">' + (d.cli || '—') + '</td>' +
+      '<td style="text-align:center"><span class="' + (av >= 5 ? 'av-hi' : 'av-ok') + '">' + d.av + '</span></td>' +
+      '<td class="trunc" style="font-size:11.5px' + (urg ? ';color:#fca5a5;font-weight:500' : '') + '">' + (urg ? '&#9888; ' : '') + (d.tipo || '—') + '</td>' +
+      '<td>' + vtrHtml + '</td></tr>';
+  }).join('');
+}
+
+function filtrar(area) {
+  filtroAtivo = area;
+  renderFiltros();
+  renderTabela();
+}
+
+// Roda ao carregar
+if (dados.length > 0) {
+  renderMetricas();
+  renderEquipes();
+  renderAreas();
+  renderFiltros();
+  renderTabela();
+} else {
+  document.getElementById('m-total').textContent = '—';
+  document.getElementById('m-cli').textContent = '—';
+  document.getElementById('m-sv').textContent = '—';
+  document.getElementById('m-urg').textContent = '—';
+}
+</script>
+</body>
+</html>
