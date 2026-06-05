@@ -19,28 +19,12 @@
   --red:#dc2626;--orange:#b45309;--blue:#1d4ed8;--green:#047857;--purple:#6d28d9;
 }
 :root.light .hdr{border-bottom:1px solid rgba(0,0,0,0.1)}
-:root.light .met{box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-:root.light .eq-card{box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-:root.light .area{box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-:root.light .tbl-card{box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-:root.light .met-label{color:#374151}
-:root.light .met-sub{color:#4b5563}
-:root.light .eq-title{color:#374151}
-:root.light .eq-total{color:#4b5563}
-:root.light .eq-lbl{color:#374151}
-:root.light .eq-pct{color:#6b7280}
-:root.light .area-name{color:#374151}
-:root.light .area-row{color:#4b5563}
-:root.light .tbl-label{color:#111827}
+:root.light .met,:root.light .eq-card,:root.light .area,:root.light .tbl-card{box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+:root.light .met-label,:root.light .eq-title,:root.light .eq-total,:root.light .eq-lbl,:root.light .area-name,:root.light .tbl-label,:root.light th{color:#374151}
+:root.light .met-sub,:root.light .area-row,:root.light .eq-pct{color:#4b5563}
+:root.light .mono,:root.light .dur-ok,:root.light .hdr-sub,:root.light .hdr-time,:root.light .theme-btn{color:#374151}
 :root.light .fbtn{color:#374151;border-color:rgba(0,0,0,0.15)}
 :root.light .fbtn:hover{background:#f3f4f6;color:#111827}
-:root.light th{color:#374151}
-:root.light .mono{color:#4b5563}
-:root.light .dur-ok{color:#4b5563}
-:root.light .hdr-sub{color:#4b5563}
-:root.light .hdr-time{color:#4b5563}
-:root.light .theme-btn{color:#374151;border-color:rgba(0,0,0,0.15)}
-:root.light .chip-live{background:rgba(5,150,105,0.1);color:#047857;border-color:rgba(5,150,105,0.3)}
 :root.light .vtr-em{background:rgba(29,78,216,0.08);color:#1d4ed8;border-color:rgba(29,78,216,0.2)}
 :root.light .vtr-co{background:rgba(4,120,87,0.08);color:#047857;border-color:rgba(4,120,87,0.2)}
 :root.light .vtr-ml{background:rgba(180,83,9,0.08);color:#b45309;border-color:rgba(180,83,9,0.2)}
@@ -53,28 +37,25 @@
 :root.light .count-chip{color:#374151}
 :root.light tbody tr.urg{background:rgba(220,38,38,0.05)}
 :root.light tbody tr:hover{background:rgba(0,0,0,0.02)}
+:root.light .chip-live{background:rgba(5,150,105,0.1);color:#047857;border-color:rgba(5,150,105,0.3)}
+
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:13px}
 
-/* HEADER */
-.theme-btn{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.theme-btn:hover{border-color:var(--blue);color:var(--text)}
 .hdr{background:var(--s1);border-bottom:1px solid var(--border);padding:.75rem 1.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
 .hdr-l{display:flex;align-items:center;gap:9px}
-.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(16,185,129,.4);animation:ping 2s infinite;flex-shrink:0}
-@keyframes ping{0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}70%{box-shadow:0 0 0 7px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:p 2s infinite;flex-shrink:0}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.4}}
 .hdr-title{font-size:13.5px;font-weight:600;letter-spacing:-.01em}
 .hdr-sub{font-size:11px;color:var(--muted2)}
 .chip-live{font-size:9.5px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);text-transform:uppercase}
 .hdr-time{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace}
+.theme-btn{display:flex;align-items:center;gap:5px;font-size:11.5px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted2);cursor:pointer;font-family:'DM Sans',sans-serif}
 
-/* LAYOUT */
 .wrap{padding:1.25rem 1.75rem;max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 
-/* MÉTRICAS */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.met{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;position:relative;overflow:hidden;transition:border-color .2s}
-.met:hover{border-color:rgba(255,255,255,0.12)}
+.met{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;position:relative;overflow:hidden}
 .met::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
 .met-blue::before{background:var(--blue)}
 .met-red::before{background:var(--red)}
@@ -90,14 +71,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .urg-pills{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
 .urg-pill{font-size:9.5px;padding:1px 6px;border-radius:3px;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.2);white-space:nowrap}
 
-/* EQUIPES */
 .eq-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:.9rem 1.1rem}
 .eq-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .eq-title{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
 .eq-total{font-size:10.5px;color:var(--muted);font-family:'DM Mono',monospace}
 .eq-barra{height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;display:flex;margin-bottom:8px}
 .eq-seg{height:100%}
-.eq-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.eq-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .eq-item{display:flex;align-items:center;gap:6px;font-size:11.5px}
 .eq-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 .eq-num{font-weight:600}
@@ -112,7 +92,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .vtr-ml{background:rgba(245,158,11,0.1);color:#fcd34d;border-color:rgba(245,158,11,0.22)}
 .vtr-el{background:rgba(107,114,128,0.1);color:#9ca3af;border-color:rgba(107,114,128,0.18)}
 
-/* ÁREAS */
 .areas{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .area{background:var(--s1);border:1px solid var(--border);border-top-width:2px;border-radius:8px;padding:.75rem 1rem}
 .area-num{font-size:26px;font-weight:200;line-height:1;margin-bottom:1px}
@@ -120,11 +99,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .area-row{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:2px}
 .area-val{font-family:'DM Mono',monospace;font-size:10.5px}
 
-/* TABELA */
 .tbl-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
 .tbl-top{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.1rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
 .tbl-label{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
-.tbl-count{font-size:10.5px;font-family:'DM Mono',monospace;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--muted2);margin-left:8px}
+.count-chip{font-size:10.5px;font-family:'DM Mono',monospace;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--muted2);margin-left:8px}
 .filters{display:flex;gap:4px;flex-wrap:wrap}
 .fbtn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .fbtn:hover{color:var(--text);border-color:rgba(255,255,255,0.14)}
@@ -150,16 +128,16 @@ td{padding:7px 11px;vertical-align:middle}
 .no-eq{font-size:10.5px;color:var(--orange)}
 .av-hi{color:var(--orange);font-weight:600;font-family:'DM Mono',monospace}
 .av-ok{font-family:'DM Mono',monospace;color:var(--muted2)}
-.vtag{font-size:9.5px;font-family:'DM Mono',monospace;padding:1px 6px;border-radius:3px;border:1px solid}
+.vtag{font-size:9.5px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:3px;border:1px solid;display:inline-block}
 
 @media(max-width:900px){
   .metrics,.areas{grid-template-columns:repeat(2,1fr)}
   .wrap{padding:.9rem}
+  .hdr{padding:.75rem 1rem}
 }
 </style>
 </head>
 <body>
-
 <header class="hdr">
   <div class="hdr-l">
     <div class="pulse"></div>
@@ -169,171 +147,230 @@ td{padding:7px 11px;vertical-align:middle}
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:10px">
-    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" title="Alternar tema">
+    <button class="theme-btn" onclick="toggleTheme()" title="Alternar tema">
       <span id="theme-icon">☀️</span>
       <span id="theme-label">Claro</span>
     </button>
     <span class="chip-live">● ao vivo</span>
-    <span class="hdr-time" id="hdr-time">05/06/2026 11:01:25</span>
+    <span class="hdr-time" id="hdr-time">--/--/---- --:--:--</span>
   </div>
 </header>
 
 <div class="wrap">
-
-  <!-- MÉTRICAS -->
   <div class="metrics">
     <div class="met met-blue">
-      <div class="met-num">44</div>
+      <div class="met-num" id="val-total">—</div>
       <div class="met-label">Incidências ativas</div>
-      <div class="met-sub">24 recebidas · 20 novas</div>
+      <div class="met-sub" id="sub-total">— recebidas · — novas</div>
     </div>
     <div class="met met-muted">
-      <div class="met-num">311</div>
+      <div class="met-num" id="val-cli">—</div>
       <div class="met-label">Clientes afetados</div>
-      <div class="met-sub">0,02% da base sul</div>
+      <div class="met-sub">base sul</div>
     </div>
     <div class="met met-orange">
-      <div class="met-num">19</div>
+      <div class="met-num" id="val-sv">—</div>
       <div class="met-label">Aguardando viatura</div>
-      <div class="met-sub">43% ainda sem equipe</div>
+      <div class="met-sub" id="sub-sv">— ainda sem equipe</div>
     </div>
     <div class="met met-red">
-      <div class="met-num">4</div>
+      <div class="met-num" id="val-urg">—</div>
       <div class="met-label">Urgentes / risco de vida</div>
-      <div class="urg-pills"><span class="urg-pill">FALTA EM CLIENTE VITAL · CRATO</span><span class="urg-pill">PERIGO IMINENTE · CRATO</span><span class="urg-pill">PERIGO IMINENTE · MILAGRES</span><span class="urg-pill">PERIGO IMINENTE · CRATO</span></div>
+      <div class="urg-pills" id="urg-pills"></div>
     </div>
   </div>
 
-  <!-- EQUIPES EM CAMPO -->
   <div class="eq-card">
     <div class="eq-top">
       <span class="eq-title">Equipes em campo agora</span>
-      <span class="eq-total">18 viaturas em atendimento</span>
+      <span class="eq-total" id="eq-total">— viaturas em atendimento</span>
     </div>
-    <div class="eq-barra"><div class="eq-seg" style="width:61%;background:var(--red);opacity:.85"></div><div class="eq-seg" style="width:17%;background:var(--green)"></div><div class="eq-seg" style="width:22%;background:var(--muted)"></div></div><div class="eq-seg" style="width:17%;background:var(--green)"></div><div class="eq-seg" style="width:22%;background:var(--muted)"></div></div><div class="eq-seg" style="width:16%;background:var(--green)"></div><div class="eq-seg" style="width:21%;background:var(--muted)"></div></div><div class="eq-seg" style="width:16%;background:var(--green)"></div><div class="eq-seg" style="width:21%;background:var(--muted)"></div></div><div class="eq-seg" style="width:19%;background:var(--green)"></div><div class="eq-seg" style="width:19%;background:var(--muted)"></div></div><div class="eq-seg" style="width:15%;background:var(--green)"></div><div class="eq-seg" style="width:20%;background:var(--muted)"></div></div><div class="eq-seg" style="width:15%;background:var(--green)"></div><div class="eq-seg" style="width:30%;background:var(--muted)"></div></div><div class="eq-seg" style="width:15%;background:var(--green)"></div><div class="eq-seg" style="width:30%;background:var(--muted)"></div></div><div class="eq-seg" style="width:15%;background:var(--green)"></div><div class="eq-seg" style="width:30%;background:var(--muted)"></div></div><div class="eq-seg" style="width:15%;background:var(--green)"></div><div class="eq-seg" style="width:30%;background:var(--muted)"></div></div>
-      <div class="eq-seg" style="width:11%;background:var(--green)"></div>
-      <div class="eq-seg" style="width:17%;background:var(--muted)"></div>
-    </div>
-    <div class="eq-legend"><div class="eq-item"><div class="eq-dot" style="background:var(--red)"></div><span class="eq-num" style="color:#fca5a5">11</span><span class="eq-lbl">Cosampa Emergencial</span><span class="eq-pct">61%</span></div><div class="eq-item"><div class="eq-dot" style="background:var(--green)"></div><span class="eq-num" style="color:#6ee7b7">3</span><span class="eq-lbl">Cosampa Comercial/Outros</span><span class="eq-pct">17%</span></div><div class="eq-item"><div class="eq-dot" style="background:var(--muted)"></div><span class="eq-num" style="color:#9ca3af">4</span><span class="eq-lbl">Enel / não identificada</span><span class="eq-pct">22%</span><span class="eq-enel-ids">CPS-RD-90B · CPA-RD-90B · JZN-EX-94B · JZN-EX-95B</span></div></div>
+    <div class="eq-barra" id="eq-barra"></div>
+    <div class="eq-legend" id="eq-legend"></div>
     <div class="divider"></div>
-    <div class="vtr-row">
-      <span class="vtr vtr-em" title="Cosampa Emergencial">MLG-TR-11B</span>
-      <span class="vtr vtr-ml" title="Cosampa Manutenção">MLG-ML-11B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">JZB-RD-16B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">CPR-RD-12B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">CPF-RD-14B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">JZN-RD-10B</span>
-      <span class="vtr vtr-el" title="Enel / não identificada">CPS-RD-90B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">JZC-RD-18B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">JZU-RD-14B</span>
-      <span class="vtr vtr-el" title="Enel / não identificada">CPA-RD-90B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">MLM-RD-16B</span>
-      <span class="vtr vtr-co" title="Cosampa Comercial">JZN-LB-12B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">MLS-RD-15B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">CPS-TR-11B</span>
-      <span class="vtr vtr-el" title="Enel / não identificada">JZN-EX-94B</span>
-      <span class="vtr vtr-em" title="Cosampa Emergencial">JZN-RD-11B</span>
-      <span class="vtr vtr-el" title="Enel / não identificada">JZN-EX-95B</span>
-      <span class="vtr vtr-co" title="Cosampa Comercial">JZB-LB-23B</span>
-    </div>
+    <div class="vtr-row" id="vtr-row"></div>
   </div>
 
-  <!-- ÁREAS -->
-  <div class="areas">
-    <div class="area" style="border-top-color:#f59e0b">
-      <div class="area-num" style="color:#fcd34d">12</div>
-      <div class="area-name">Campos Sales</div>
-      <div class="area-row"><span>Incidências</span><span class="area-val" style="color:#fcd34d">12</span></div>
-      <div class="area-row"><span>Clientes</span><span class="area-val">11</span></div>
-    </div>
-    <div class="area" style="border-top-color:#10b981">
-      <div class="area-num" style="color:#6ee7b7">9</div>
-      <div class="area-name">Milagres</div>
-      <div class="area-row"><span>Incidências</span><span class="area-val" style="color:#6ee7b7">9</span></div>
-      <div class="area-row"><span>Clientes</span><span class="area-val">17</span></div>
-    </div>
-    <div class="area" style="border-top-color:#3b82f6">
-      <div class="area-num" style="color:#93c5fd">14</div>
-      <div class="area-name">Juazeiro do Norte</div>
-      <div class="area-row"><span>Incidências</span><span class="area-val" style="color:#93c5fd">14</span></div>
-      <div class="area-row"><span>Clientes</span><span class="area-val">262</span></div>
-    </div>
-    <div class="area" style="border-top-color:#f97316">
-      <div class="area-num" style="color:#fdba74">8</div>
-      <div class="area-name">Crato</div>
-      <div class="area-row"><span>Incidências</span><span class="area-val" style="color:#fdba74">8</span></div>
-      <div class="area-row"><span>Clientes</span><span class="area-val">4</span></div>
-    </div>
-    <div class="area" style="border-top-color:#8b5cf6">
-      <div class="area-num" style="color:#c4b5fd">1</div>
-      <div class="area-name">Icó</div>
-      <div class="area-row"><span>Incidências</span><span class="area-val" style="color:#c4b5fd">1</span></div>
-      <div class="area-row"><span>Clientes</span><span class="area-val">17</span></div>
-    </div>
-  </div>
+  <div class="areas" id="areas-grid"></div>
 
-  <!-- TABELA -->
   <div class="tbl-card">
     <div class="tbl-top">
-      <div style="display:flex;align-items:center">
+      <div>
         <span class="tbl-label">Incidências ativas</span>
-        <span class="tbl-count" id="tbl-count">37</span>
+        <span class="count-chip" id="tbl-count">—</span>
       </div>
-      <div class="filters">
-        <button class="fbtn on" onclick="filtrar('Todas')">Todas</button>
-        <button class="fbtn" onclick="filtrar('C. SALES')">C. Sales</button>
-        <button class="fbtn" onclick="filtrar('MILAGRES')">Milagres</button>
-        <button class="fbtn" onclick="filtrar('JUAZEIRO')">Juazeiro</button>
-        <button class="fbtn" onclick="filtrar('CRATO')">Crato</button>
-      </div>
+      <div class="filters" id="filters"></div>
     </div>
     <div class="tbl-wrap">
       <table>
         <thead><tr>
           <th>Nº Incidência</th><th>Estado</th><th>Área</th>
           <th>Duração</th><th style="text-align:right">Clientes</th>
-          <th style="text-align:center">Avisos</th>
-          <th>Tipo</th><th>Viatura</th>
+          <th style="text-align:center">Avisos</th><th>Tipo</th><th>Viatura</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
   </div>
-
 </div>
 
 <script>
 const AREA_COR={'MILAGRES':'#10b981','CRATO':'#f97316','C. SALES':'#f59e0b','JUAZEIRO':'#3b82f6','ICO':'#8b5cf6'};
+const AREA_NAMES={'C. SALES':'Campos Sales','MILAGRES':'Milagres','JUAZEIRO':'Juazeiro do Norte','CRATO':'Crato','ICO':'Icó'};
+const AREA_ORDER=['C. SALES','MILAGRES','JUAZEIRO','CRATO','ICO'];
 const URGENTES=['PERIGO IMINENTE','INCÊNDIO','CONDUTOR (FIO) PARTIDO','FALTA EM CLIENTE VITAL'];
-const COSAMPA_PROC={'MLP-RD-18B':'em','JZC-RD-18B':'em','JZC-RD-17B':'em','CPE-RD-16B':'em','JZN-RD-11B':'em','CPF-RD-14B':'em','MLB-RD-13B':'em','MLS-RD-15B':'em','JZN-RD-28B':'em','MLJ-RD-17B':'em','CPR-RD-12B':'em','JZN-RD-10B':'em','JZB-RD-16B':'em','JZC-LB-21B':'co','MLG-ML-11B':'ml'};
 
-const dados=[{"id": "0041270871", "est": "RECEBIDA", "area": "MILAGRES", "dur": "18:08", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11B"}, {"id": "0041270941", "est": "NOVA", "area": "MILAGRES", "dur": "17:56", "cli": "11", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-ML-11B"}, {"id": "0041273137", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "5:22", "cli": "1", "av": "5", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "JZB-RD-16B"}, {"id": "0041273575", "est": "NOVA", "area": "MILAGRES", "dur": "3:38", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041273615", "est": "RECEBIDA", "area": "C. SALES", "dur": "3:28", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPR-RD-12B"}, {"id": "0041273621", "est": "RECEBIDA", "area": "C. SALES", "dur": "3:27", "cli": "1", "av": "3", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPF-RD-14B"}, {"id": "0041273723", "est": "RECEBIDA", "area": "C. SALES", "dur": "3:10", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPR-RD-12B"}, {"id": "0041273771", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:05", "cli": "14", "av": "2", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "JZN-RD-10B"}, {"id": "0041273795", "est": "RECEBIDA", "area": "C. SALES", "dur": "3:03", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPS-RD-90B"}, {"id": "0041273869", "est": "RECEBIDA", "area": "CRATO", "dur": "2:55", "cli": "0", "av": "1", "tipo": "FALTA EM CLIENTE VITAL", "vtr": "JZC-RD-18B"}, {"id": "0041273887", "est": "NOVA", "area": "C. SALES", "dur": "2:53", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041273915", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:49", "cli": "91", "av": "1", "tipo": "TENSÃO BAIXA/ALTA", "vtr": "JZB-RD-16B"}, {"id": "0041274029", "est": "RECEBIDA", "area": "CRATO", "dur": "2:39", "cli": "0", "av": "1", "tipo": "TROCA DE DISJUNTOR", "vtr": "JZU-RD-14B"}, {"id": "0041274073", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:35", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPS-RD-90B"}, {"id": "0041274209", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:23", "cli": "1", "av": "1", "tipo": "TENSÃO BAIXA/ALTA", "vtr": "CPA-RD-90B"}, {"id": "0041274243", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:18", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "MLM-RD-16B"}, {"id": "0041274329", "est": "RECEBIDA", "area": "CRATO", "dur": "2:07", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": "JZC-RD-18B"}, {"id": "0041274453", "est": "RECEBIDA", "area": "CRATO", "dur": "1:54", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZU-RD-14B"}, {"id": "0041274473", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "1:53", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "JZN-LB-12B"}, {"id": "0041274525", "est": "NOVA", "area": "C. SALES", "dur": "1:49", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041274583", "est": "NOVA", "area": "MILAGRES", "dur": "1:43", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": ""}, {"id": "0041274611", "est": "RECEBIDA", "area": "MILAGRES", "dur": "1:40", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "MLS-RD-15B"}, {"id": "0041274865", "est": "NOVA", "area": "CRATO", "dur": "1:14", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041274877", "est": "RECEBIDA", "area": "C. SALES", "dur": "1:13", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "CPS-TR-11B"}, {"id": "0041274905", "est": "RECEBIDA", "area": "CRATO", "dur": "1:11", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": "JZN-EX-94B"}, {"id": "0041274971", "est": "NOVA", "area": "ICO", "dur": "1:03", "cli": "17", "av": "1", "tipo": "TENSÃO BAIXA/ALTA", "vtr": ""}, {"id": "0041275023", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:55", "cli": "1", "av": "1", "tipo": "TENSÃO BAIXA/ALTA", "vtr": ""}, {"id": "0041275087", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "0:49", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZN-RD-11B"}, {"id": "0041275099", "est": "NOVA", "area": "CRATO", "dur": "0:48", "cli": "1", "av": "1", "tipo": "CONSUMIDOR ESPECIAL", "vtr": ""}, {"id": "0041275159", "est": "NOVA", "area": "CRATO", "dur": "0:44", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041275219", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "0:39", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "JZN-EX-95B"}, {"id": "0041275247", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "0:36", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "JZN-EX-95B"}, {"id": "0041275273", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:34", "cli": "1", "av": "1", "tipo": "TENSÃO BAIXA/ALTA", "vtr": ""}, {"id": "0041275289", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:32", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": ""}, {"id": "0041275303", "est": "NOVA", "area": "MILAGRES", "dur": "0:30", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041275339", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:25", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041275369", "est": "NOVA", "area": "C. SALES", "dur": "0:24", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041275389", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "0:33", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZB-LB-23B"}, {"id": "0041275427", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "0:17", "cli": "148", "av": "1", "tipo": "OSCILACAO", "vtr": "JZB-LB-23B"}, {"id": "0041275465", "est": "NOVA", "area": "MILAGRES", "dur": "0:14", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041275477", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:12", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041275525", "est": "NOVA", "area": "C. SALES", "dur": "0:07", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": ""}, {"id": "0041275545", "est": "NOVA", "area": "C. SALES", "dur": "0:04", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041275565", "est": "NOVA", "area": "MILAGRES", "dur": "0:02", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": ""}];
+// Lista completa de equipes Cosampa
+const COSAMPA_PROC={
+  'CPS-TR-11B':'em','CPR-RD-12B':'em','CPN-RD-13B':'em','CPF-RD-14B':'em',
+  'CPB-RD-15B':'em','CPE-RD-16B':'em','CPE-RD-12C':'em','CPN-RD-13C':'em',
+  'CPS-TR-11C':'em','CPR-RD-14D':'em','CPN-RD-12D':'em','CPA-RD-13D':'em',
+  'JZN-RD-19C':'em','JZB-RD-16C':'em','JZN-SK-11C':'em','JZN-RD-17C':'em',
+  'JZN-RD-16C':'em','JZN-RD-13D':'em','JZN-RD-15D':'em','JZN-RD-10C':'em',
+  'JZC-RD-14D':'em','JZC-RD-12C':'em','JZN-RD-10B':'em','JZN-RD-11B':'em',
+  'JZN-RD-22B':'em','JZN-RD-15B':'em','JZB-RD-16B':'em','JZN-SK-11B':'em',
+  'JZN-RD-28B':'em','JZU-RD-14B':'em','JZC-RD-17B':'em','JZC-RD-18B':'em',
+  'JZN-MP-11B':'em','JZN-RD-27B':'em',
+  'MLG-TR-11B':'em','MLV-RD-12B':'em','MLS-RD-15B':'em','MLM-RD-16B':'em',
+  'MLJ-RD-17B':'em','MLP-RD-18B':'em','MLB-RD-13B':'em','MLG-TR-11C':'em',
+  'MLS-RD-12C':'em','MLB-RD-13C':'em','MLM-RD-14C':'em','MLV-RD-16C':'em',
+  'MLG-RD-14B':'em','MLB-RD-15D':'em',
+  'CPS-LB-11B':'co','CPR-LB-12B':'co','CPE-LB-13B':'co','CPB-LB-14B':'co',
+  'CPS-MM-11B':'co','CPP-MM-13B':'co','CPE-MM-14B':'co','CPB-MM-15B':'co',
+  'JZN-LB-12B':'co','JZN-LB-13B':'co','JZN-LB-14B':'co','JZN-LB-15B':'co',
+  'JZN-LB-17B':'co','JZC-LB-20B':'co','JZC-LB-21B':'co','JZC-LB-22B':'co',
+  'CPN-LB-28B':'co','JZN-LB-11B':'co','JZN-LB-18B':'co','JZN-LB-19B':'co',
+  'JZB-LB-23B':'co','JZB-LB-24B':'co','JZB-LB-25B':'co','MLJ-LB-16B':'co',
+  'JZU-LB-26B':'co','JZN-GA-11B':'co',
+  'JZN-MM-13B':'co','JZN-MM-14B':'co','JZN-MM-15B':'co','JZN-MM-21B':'co',
+  'JZN-MM-23B':'co','JZC-MM-11B':'co','JZC-MM-17B':'co','JZB-MM-16B':'co',
+  'JZB-MM-22B':'co','MLJ-MM-12B':'co','JZU-MM-19B':'co','CPN-MM-18B':'co',
+  'CPF-MM-24B':'co','JZN-MM-12B':'co',
+  'MLG-LB-11B':'co','MLV-LB-12B':'co','MLV-LB-13B':'co','MLS-LB-14B':'co',
+  'MLM-LB-18B':'co','MLA-LB-16B':'co','MLP-LB-19B':'co',
+  'MLG-MM-11B':'co','MLV-MM-12B':'co','MLS-MM-13B':'co','MLM-MM-14B':'co',
+  'MLA-MM-15B':'co','MLP-MM-16B':'co',
+  'CPS-MP-11B':'ml','CPS-COS-02B':'ml','CPS-COS-03B':'ml','CPS-COS-01B':'ml',
+  'CPS-COS-04B':'ml','CPS-COS-05B':'ml','CPS-LV-11B':'ml',
+  'JZN-ML-11B':'ml','JZN-LV-11B':'ml','JZN-LV-12B':'ml',
+  'JZN-LV-11R':'ml','JZN-LV-12R':'ml',
+  'JZN-COS-01B':'ml','JZN-COS-02B':'ml','JZN-COS-03B':'ml','JZN-COS-05B':'ml',
+  'JZN-COS-06B':'ml','JZN-COS-07B':'ml','JZN-COS-04B':'ml','JZD-COS-09B':'ml',
+  'JZN-COS-10B':'ml','JZN-COS-11B':'ml','JZN-COS-12B':'ml',
+  'MLG-ML-11B':'ml','MLG-MP-11B':'ml','MLG-COS-01B':'ml','MLG-COS-03B':'ml',
+  'MLG-COS-04B':'ml','MLG-COS-06B':'ml','MLG-COS-02B':'ml','MLG-COS-05B':'ml',
+  'MLG-COS-08B':'ml','MLG-COS-09B':'ml','MLG-LV-11B':'ml',
+};
+const VTR_CLS={'em':'vtr-em','co':'vtr-co','ml':'vtr-ml','ob':'vtr-co'};
+const VTR_TITLE={'em':'Cosampa Emergencial','co':'Cosampa Comercial','ml':'Cosampa Manutenção','ob':'Cosampa Obras'};
 
-function durMin(d){const p=d.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+const dados=[];
+
+function durMin(d){const p=(d||'0:0').split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+
+function renderTudo(){
+  if(!dados.length) return;
+
+  const total = dados.length;
+  const totalCli = dados.reduce((s,d)=>s+parseInt(d.cli||0),0);
+  const semVtr = dados.filter(d=>!d.vtr).length;
+  const pctSv = total?Math.round(semVtr*100/total):0;
+  const rec = dados.filter(d=>d.est==='RECEBIDA').length;
+  const nova = dados.filter(d=>d.est==='NOVA').length;
+  const urgs = dados.filter(d=>URGENTES.includes((d.tipo||'').toUpperCase()));
+
+  document.getElementById('val-total').textContent = total;
+  document.getElementById('sub-total').textContent = `${rec} recebidas · ${nova} novas`;
+  document.getElementById('val-cli').textContent = totalCli.toLocaleString('pt-BR');
+  document.getElementById('val-sv').textContent = semVtr;
+  document.getElementById('sub-sv').textContent = `${pctSv}% ainda sem equipe`;
+  document.getElementById('val-urg').textContent = urgs.length;
+  document.getElementById('urg-pills').innerHTML = urgs.slice(0,4).map(d=>
+    `<span class="urg-pill">${d.tipo} · ${d.area}</span>`).join('');
+
+  // Equipes
+  const vtrsUnicas = [...new Set(dados.filter(d=>d.vtr).map(d=>d.vtr))];
+  const tvtr = vtrsUnicas.length;
+  const nEm = vtrsUnicas.filter(v=>COSAMPA_PROC[v]==='em').length;
+  const nCo = vtrsUnicas.filter(v=>['co','ob'].includes(COSAMPA_PROC[v])).length;
+  const nMl = vtrsUnicas.filter(v=>COSAMPA_PROC[v]==='ml').length;
+  const nEl = vtrsUnicas.filter(v=>!COSAMPA_PROC[v]).length;
+  const nCos = nEm+nCo+nMl;
+  const pEm = tvtr?Math.round(nEm*100/tvtr):0;
+  const pCoMl = tvtr?Math.round((nCo+nMl)*100/tvtr):0;
+  const pEl = 100-pEm-pCoMl;
+  const vtrsEl = vtrsUnicas.filter(v=>!COSAMPA_PROC[v]);
+
+  document.getElementById('eq-total').textContent = `${tvtr} viaturas em atendimento`;
+  document.getElementById('eq-barra').innerHTML =
+    `<div class="eq-seg" style="width:${pEm}%;background:var(--red);opacity:.85"></div>`+
+    `<div class="eq-seg" style="width:${pCoMl}%;background:var(--green)"></div>`+
+    `<div class="eq-seg" style="width:${pEl}%;background:var(--muted)"></div>`;
+  document.getElementById('eq-legend').innerHTML =
+    `<div class="eq-item"><div class="eq-dot" style="background:var(--red)"></div><span class="eq-num" style="color:#fca5a5">${nEm}</span><span class="eq-lbl">Cosampa Emergencial</span><span class="eq-pct">${pEm}%</span></div>`+
+    `<div class="eq-item"><div class="eq-dot" style="background:var(--green)"></div><span class="eq-num" style="color:#6ee7b7">${nCo+nMl}</span><span class="eq-lbl">Cosampa Comercial/Outros</span><span class="eq-pct">${pCoMl}%</span></div>`+
+    `<div class="eq-item"><div class="eq-dot" style="background:var(--muted)"></div><span class="eq-num" style="color:#9ca3af">${nEl}</span><span class="eq-lbl">Enel / não identificada</span><span class="eq-pct">${pEl}%</span>`+
+    (vtrsEl.length?`<span class="eq-enel-ids">${vtrsEl.join(' · ')}</span>`:'')+`</div>`;
+  document.getElementById('vtr-row').innerHTML = vtrsUnicas.map(v=>{
+    const p=COSAMPA_PROC[v];
+    const cls=VTR_CLS[p]||'vtr-el';
+    const title=VTR_TITLE[p]||'Enel / não identificada';
+    return `<span class="vtr ${cls}" title="${title}">${v}</span>`;
+  }).join('');
+
+  // Áreas
+  const aCnt={}, aCli={};
+  dados.forEach(d=>{
+    const a=d.area||'OUTROS';
+    aCnt[a]=(aCnt[a]||0)+1;
+    aCli[a]=(aCli[a]||0)+parseInt(d.cli||0);
+  });
+  document.getElementById('areas-grid').innerHTML = AREA_ORDER.map(a=>{
+    const cor=AREA_COR[a]||'#888';
+    const nome=AREA_NAMES[a]||a;
+    const cnt=aCnt[a]||0;
+    const cli=aCli[a]||0;
+    return `<div class="area" style="border-top-color:${cor}">
+      <div class="area-num" style="color:${cor}">${cnt}</div>
+      <div class="area-name">${nome}</div>
+      <div class="area-row"><span>Incidências</span><span class="area-val" style="color:${cor}">${cnt}</span></div>
+      <div class="area-row" style="margin-top:3px"><span>Clientes</span><span class="area-val">${cli}</span></div>
+    </div>`;
+  }).join('');
+
+  renderTabela();
+}
 
 let filtroAtivo='Todas';
+const AREAS_FILTRO=['Todas','C. SALES','MILAGRES','JUAZEIRO','CRATO'];
+document.getElementById('filters').innerHTML = AREAS_FILTRO.map(a=>
+  `<button class="fbtn${a==='Todas'?' on':''}" onclick="filtrar('${a}')">${a==='Todas'?'Todas':AREA_NAMES[a]||a}</button>`
+).join('');
+
 function filtrar(area){
   filtroAtivo=area;
-  document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('on',b.textContent.trim()===(area==='Todas'?'Todas':area==='C. SALES'?'C. Sales':area.charAt(0)+area.slice(1).toLowerCase())));
+  document.querySelectorAll('.fbtn').forEach(b=>{
+    const isAll = area==='Todas' && b.textContent==='Todas';
+    const isArea = area!=='Todas' && (b.textContent===(AREA_NAMES[area]||area));
+    b.classList.toggle('on', isAll||isArea);
+  });
   renderTabela();
 }
 
 function renderTabela(){
-  const lista=filtroAtivo==='Todas'?dados:dados.filter(d=>d.area===filtroAtivo);
-  document.getElementById('tbl-count').textContent=lista.length;
-  document.getElementById('tbody').innerHTML=lista.map(d=>{
-    const urg=URGENTES.includes(d.tipo);
-    const longa=durMin(d.dur)>120;
-    const badge=d.est==='NOVA'?'bdg-n':'bdg-r';
-    const cor=AREA_COR[d.area]||'#888';
-    const proc=COSAMPA_PROC[d.vtr];
-    let vtr;
-    if(!d.vtr) vtr=`<span class="no-eq">⚠ sem equipe</span>`;
-    else{
-      const cls=proc==='em'?'vtr-em':proc==='co'?'vtr-co':proc==='ml'?'vtr-ml':'vtr-el';
-      vtr=`<span class="vtag ${cls}">${d.vtr}</span>`;
-    }
-    const av=parseInt(d.av)||0;
+  const lista = filtroAtivo==='Todas' ? dados : dados.filter(d=>d.area===filtroAtivo);
+  document.getElementById('tbl-count').textContent = lista.length;
+  document.getElementById('tbody').innerHTML = lista.map(d=>{
+    const urg = URGENTES.includes((d.tipo||'').toUpperCase());
+    const longa = durMin(d.dur)>120;
+    const badge = d.est==='NOVA'?'bdg-n':'bdg-r';
+    const cor = AREA_COR[d.area]||'#888';
+    const proc = COSAMPA_PROC[d.vtr];
+    const cls = VTR_CLS[proc]||'vtr-el';
+    const vtrHtml = d.vtr
+      ? `<span class="vtag ${cls}">${d.vtr}</span>`
+      : `<span class="no-eq">⚠ sem equipe</span>`;
+    const av = parseInt(d.av)||0;
     return `<tr class="${urg?'urg':''}">
       <td class="mono">${d.id}</td>
       <td><span class="bdg ${badge}">${d.est}</span></td>
@@ -342,28 +379,26 @@ function renderTabela(){
       <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11.5px">${d.cli||'—'}</td>
       <td style="text-align:center"><span class="${av>=5?'av-hi':'av-ok'}">${d.av}</span></td>
       <td class="trunc" style="font-size:11.5px${urg?';color:#fca5a5;font-weight:500':''}">${urg?'⚠ ':''}${d.tipo}</td>
-      <td>${vtr}</td>
+      <td>${vtrHtml}</td>
     </tr>`;
   }).join('');
 }
-renderTabela();
 
 function toggleTheme(){
-  const root = document.documentElement;
-  const isLight = root.classList.toggle('light');
-  document.getElementById('theme-icon').textContent = isLight ? '🌙' : '☀️';
-  document.getElementById('theme-label').textContent = isLight ? 'Escuro' : 'Claro';
-  localStorage.setItem('sgt-theme', isLight ? 'light' : 'dark');
+  const isLight = document.documentElement.classList.toggle('light');
+  document.getElementById('theme-icon').textContent = isLight?'🌙':'☀️';
+  document.getElementById('theme-label').textContent = isLight?'Escuro':'Claro';
+  localStorage.setItem('sgt-theme', isLight?'light':'dark');
 }
-
-// Aplica tema salvo ao carregar
 (function(){
-  if(localStorage.getItem('sgt-theme') === 'light'){
+  if(localStorage.getItem('sgt-theme')==='light'){
     document.documentElement.classList.add('light');
-    document.getElementById('theme-icon').textContent = '🌙';
-    document.getElementById('theme-label').textContent = 'Escuro';
+    document.getElementById('theme-icon').textContent='🌙';
+    document.getElementById('theme-label').textContent='Escuro';
   }
 })();
+
+renderTudo();
 </script>
 </body>
 </html>
