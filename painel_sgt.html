@@ -347,7 +347,8 @@ function renderTudo(){
     </div>`;
   }).join('');
 
-  renderTabela();
+  window._dadosAtuais = dados;
+  renderTabelaLive(filtroAtivo);
 }
 
 let filtroAtivo='Todas';
@@ -363,34 +364,7 @@ function filtrar(area){
     const isArea = area!=='Todas' && (b.textContent===(AREA_NAMES[area]||area));
     b.classList.toggle('on', isAll||isArea);
   });
-  renderTabela();
-}
-
-function renderTabela(){
-  const lista = filtroAtivo==='Todas' ? dados : dados.filter(d=>d.area===filtroAtivo);
-  document.getElementById('tbl-count').textContent = lista.length;
-  document.getElementById('tbody').innerHTML = lista.map(d=>{
-    const urg = URGENTES.includes((d.tipo||'').toUpperCase());
-    const longa = durMin(d.dur)>120;
-    const badge = d.est==='NOVA'?'bdg-n':'bdg-r';
-    const cor = AREA_COR[d.area]||'#888';
-    const proc = COSAMPA_PROC[d.vtr];
-    const cls = VTR_CLS[proc]||'vtr-el';
-    const vtrHtml = d.vtr
-      ? `<span class="vtag ${cls}">${d.vtr}</span>`
-      : `<span class="no-eq">⚠ sem equipe</span>`;
-    const av = parseInt(d.av)||0;
-    return `<tr class="${urg?'urg':''}">
-      <td class="mono">${d.id}</td>
-      <td><span class="bdg ${badge}">${d.est}</span></td>
-      <td><span class="adot" style="background:${cor}"></span><span style="font-size:11.5px">${d.area}</span></td>
-      <td class="${longa?'dur-hi':'dur-ok'}">${d.dur}</td>
-      <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11.5px">${d.cli||'—'}</td>
-      <td style="text-align:center"><span class="${av>=5?'av-hi':'av-ok'}">${d.av}</span></td>
-      <td class="trunc" style="font-size:11.5px${urg?';color:#fca5a5;font-weight:500':''}">${urg?'⚠ ':''}${d.tipo}</td>
-      <td>${vtrHtml}</td>
-    </tr>`;
-  }).join('');
+  renderTabelaLive(area);
 }
 
 function toggleTheme(){
@@ -415,12 +389,6 @@ renderTudo();
 const DADOS_URL = 'https://igorbezerra9-svg.github.io/Painel-Ocorr-ncias-Cosampa/dados.json';
 let ultimoAtualizado = null;
 
-// URGENTES_SET já declarado acima
-// AREA_COR já declarado acima
-// COSAMPA_PROC já declarado acima
-
-function durMin(d){const p=d.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
-
 function vtrTag(v, small=false){
   if(!v) return '<span style="font-size:10.5px;color:var(--orange)">⚠ sem equipe</span>';
   const p=COSAMPA_PROC[v];
@@ -436,7 +404,7 @@ function atualizarPainel(payload){
   const total = dados.length;
   const cli   = dados.reduce((s,d)=>s+parseInt(d.cli||0),0);
   const sv    = dados.filter(d=>!d.vtr).length;
-  const urg   = dados.filter(d=>URGENTES_SET.has(d.tipo)).length;
+  const urg   = dados.filter(d=>URGENTES.includes((d.tipo||'').toUpperCase())).length;
   const rec   = dados.filter(d=>d.est==='RECEBIDA').length;
   const nova  = dados.filter(d=>d.est==='NOVA').length;
   const pctSv = total?Math.round(sv*100/total):0;
@@ -450,7 +418,7 @@ function atualizarPainel(payload){
   document.querySelector('.met.met-red .met-num').textContent = urg;
 
   // Pills urgentes
-  const urgDados = dados.filter(d=>URGENTES_SET.has(d.tipo)).slice(0,4);
+  const urgDados = dados.filter(d=>URGENTES.includes((d.tipo||'').toUpperCase())).slice(0,4);
   document.querySelector('.urg-pills').innerHTML = urgDados
     .map(d=>`<span class="urg-pill">${d.tipo} · ${d.area}</span>`).join('');
 
@@ -517,7 +485,7 @@ function renderTabelaLive(area){
   const tbody=document.getElementById('tbody');
   if(!tbody) return;
   tbody.innerHTML=lista.map((d,i)=>{
-    const urg=URGENTES_SET.has(d.tipo);
+    const urg=URGENTES.includes((d.tipo||'').toUpperCase());
     const longa=durMin(d.dur)>120;
     const badge=d.est==='NOVA'?'bdg-n':'bdg-r';
     const cor=AREA_COR[d.area]||'#888';
@@ -553,17 +521,6 @@ function renderTabelaLive(area){
     </tr>${obsRow}`;
   }).join('');
 }
-
-// Sobrescreve filtrar para usar dados ao vivo
-function filtrar(area){
-  filtroAtivo=area;
-  document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('on',
-    b.textContent.trim()===(area==='Todas'?'Todas':area==='C. SALES'?'C. Sales':
-    area.charAt(0)+area.slice(1).toLowerCase())));
-  renderTabelaLive(area);
-}
-
-let filtroAtivo='Todas';
 
 function toggleObs(id){
   const row = document.getElementById(id);
