@@ -127,6 +127,15 @@ td{padding:7px 11px;vertical-align:middle}
 .mono{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted2)}
 .no-eq{font-size:10.5px;color:var(--orange)}
 .av-hi{color:var(--orange);font-weight:600;font-family:'DM Mono',monospace}
+.btn-map{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);color:#93c5fd;font-size:13px;cursor:pointer;text-decoration:none;transition:all .15s;flex-shrink:0}
+.btn-map:hover{background:rgba(59,130,246,0.25);color:#bfdbfe}
+.obs-row{display:none;background:rgba(255,255,255,0.02)}
+.obs-row td{padding:4px 12px 8px 12px;font-size:11px;color:var(--muted2);font-style:italic;line-height:1.5}
+.obs-row.show{display:table-row}
+.btn-obs{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;background:transparent;border:1px solid var(--border);color:var(--muted2);font-size:10px;cursor:pointer;transition:all .15s;margin-left:4px;flex-shrink:0}
+.btn-obs:hover{border-color:var(--muted2);color:var(--text)}
+.btn-obs.active{background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.3);color:var(--orange)}
+.id-cell{display:flex;align-items:center;gap:4px}
 .av-ok{font-family:'DM Mono',monospace;color:var(--muted2)}
 .vtag{font-size:9.5px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:3px;border:1px solid;display:inline-block}
 
@@ -152,7 +161,7 @@ td{padding:7px 11px;vertical-align:middle}
       <span id="theme-label">Claro</span>
     </button>
     <span class="chip-live">● ao vivo</span>
-    <span class="hdr-time" id="hdr-time">06/06/2026 11:07:37</span>
+    <span class="hdr-time" id="hdr-time">06/06/2026 11:04:26</span>
   </div>
 </header>
 
@@ -264,7 +273,7 @@ const COSAMPA_PROC={
 const VTR_CLS={'em':'vtr-em','co':'vtr-co','ml':'vtr-ml','ob':'vtr-co'};
 const VTR_TITLE={'em':'Cosampa Emergencial','co':'Cosampa Comercial','ml':'Cosampa Manutenção','ob':'Cosampa Obras'};
 
-const dados=[{"id": "0041275303", "est": "NOVA", "area": "MILAGRES", "dur": "24:36", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-MP-12B"}, {"id": "0041277815", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "18:56", "cli": "335", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "JZN-EX-90B"}, {"id": "0041278549", "est": "NOVA", "area": "MILAGRES", "dur": "16:52", "cli": "2", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041278795", "est": "NOVA", "area": "MILAGRES", "dur": "16:00", "cli": "24", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041279603", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "11:44", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": "JZU-RD-14B"}, {"id": "0041279619", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "11:41", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-RD-15B"}, {"id": "0041279631", "est": "RECEBIDA", "area": "MILAGRES", "dur": "11:34", "cli": "7", "av": "3", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11B"}, {"id": "0041279673", "est": "RECEBIDA", "area": "C. SALES", "dur": "14:12", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "JZC-RD-18B"}, {"id": "0041279885", "est": "RECEBIDA", "area": "MILAGRES", "dur": "8:21", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11B"}, {"id": "0041279941", "est": "NOVA", "area": "C. SALES", "dur": "6:56", "cli": "3", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPN-RD-90B"}, {"id": "0041280197", "est": "NOVA", "area": "JUAZEIRO", "dur": "4:41", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041280229", "est": "RECEBIDA", "area": "ICO", "dur": "4:28", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11B"}, {"id": "0041280359", "est": "RECEBIDA", "area": "CRATO", "dur": "3:56", "cli": "31", "av": "4", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZC-RD-17B"}, {"id": "0041280389", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:49", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-EX-94B"}, {"id": "0041280395", "est": "NOVA", "area": "C. SALES", "dur": "3:48", "cli": "7", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041280531", "est": "RECEBIDA", "area": "CRATO", "dur": "3:16", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZU-RD-14B"}, {"id": "0041280557", "est": "NOVA", "area": "ICO", "dur": "3:13", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041280607", "est": "RECEBIDA", "area": "MILAGRES", "dur": "3:04", "cli": "1", "av": "5", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "MLS-RD-15B"}, {"id": "0041280629", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:58", "cli": "1", "av": "2", "tipo": "FALTA EM CLIENTE VITAL", "vtr": "JZU-RD-14B"}, {"id": "0041280661", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:54", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": "MLM-RD-16B"}, {"id": "0041280729", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:44", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "CPN-RD-90B"}, {"id": "0041280735", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:44", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPA-RD-90B"}, {"id": "0041280765", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:39", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZN-LB-11B"}, {"id": "0041280909", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:13", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "MLJ-RD-17B"}, {"id": "0041280915", "est": "NOVA", "area": "CRATO", "dur": "2:12", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041280927", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:11", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPS-RD-90B"}, {"id": "0041280963", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:05", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZN-LB-15B"}, {"id": "0041280971", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:05", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLV-RD-12B"}, {"id": "0041281043", "est": "NOVA", "area": "MILAGRES", "dur": "1:56", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": ""}, {"id": "0041281055", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "1:55", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZN-RD-15B"}, {"id": "0041281065", "est": "NOVA", "area": "ICO", "dur": "1:53", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041281127", "est": "RECEBIDA", "area": "C. SALES", "dur": "1:43", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPS-RD-90B"}, {"id": "0041281153", "est": "RECEBIDA", "area": "MILAGRES", "dur": "1:39", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLM-RD-16B"}, {"id": "0041281165", "est": "NOVA", "area": "CRATO", "dur": "1:37", "cli": "0", "av": "3", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": ""}, {"id": "0041281199", "est": "NOVA", "area": "MILAGRES", "dur": "1:31", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281305", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "1:14", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-EX-91B"}, {"id": "0041281389", "est": "NOVA", "area": "MILAGRES", "dur": "1:02", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281391", "est": "NOVA", "area": "CRATO", "dur": "1:02", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041281403", "est": "RECEBIDA", "area": "MILAGRES", "dur": "1:00", "cli": "1", "av": "2", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "MLV-RD-12B"}, {"id": "0041281497", "est": "NOVA", "area": "CRATO", "dur": "0:49", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281527", "est": "NOVA", "area": "MILAGRES", "dur": "0:45", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281581", "est": "NOVA", "area": "C. SALES", "dur": "0:38", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": ""}, {"id": "0041281747", "est": "NOVA", "area": "C. SALES", "dur": "0:16", "cli": "1", "av": "1", "tipo": "VEGETACAO SOBRE A REDE", "vtr": ""}, {"id": "0041281755", "est": "NOVA", "area": "C. SALES", "dur": "0:15", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281825", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:05", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281843", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:28", "cli": "0", "av": "1", "tipo": "FALTA EM CLIENTE VITAL", "vtr": ""}];
+const dados=[{"id": "0041275303", "est": "NOVA", "area": "MILAGRES", "dur": "24:33", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-MP-12B"}, {"id": "0041277815", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "18:53", "cli": "335", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "JZN-EX-90B"}, {"id": "0041278549", "est": "NOVA", "area": "MILAGRES", "dur": "16:49", "cli": "2", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041278795", "est": "NOVA", "area": "MILAGRES", "dur": "15:56", "cli": "24", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041279603", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "11:41", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": "JZU-RD-14B"}, {"id": "0041279619", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "11:38", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-RD-15B"}, {"id": "0041279631", "est": "RECEBIDA", "area": "MILAGRES", "dur": "11:31", "cli": "7", "av": "3", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11B"}, {"id": "0041279673", "est": "RECEBIDA", "area": "C. SALES", "dur": "14:09", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "JZC-RD-18B"}, {"id": "0041279885", "est": "RECEBIDA", "area": "MILAGRES", "dur": "8:18", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11B"}, {"id": "0041279941", "est": "NOVA", "area": "C. SALES", "dur": "6:53", "cli": "3", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPN-RD-90B"}, {"id": "0041280197", "est": "NOVA", "area": "JUAZEIRO", "dur": "4:38", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041280229", "est": "RECEBIDA", "area": "ICO", "dur": "4:25", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLG-TR-11B"}, {"id": "0041280359", "est": "RECEBIDA", "area": "CRATO", "dur": "3:53", "cli": "31", "av": "4", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZC-RD-17B"}, {"id": "0041280389", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:46", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-EX-94B"}, {"id": "0041280395", "est": "NOVA", "area": "C. SALES", "dur": "3:45", "cli": "7", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041280459", "est": "RECEBIDA", "area": "MILAGRES", "dur": "3:26", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "MLB-RD-13B"}, {"id": "0041280531", "est": "RECEBIDA", "area": "CRATO", "dur": "3:13", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZU-RD-14B"}, {"id": "0041280557", "est": "NOVA", "area": "ICO", "dur": "3:09", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041280607", "est": "RECEBIDA", "area": "MILAGRES", "dur": "3:01", "cli": "1", "av": "5", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "MLS-RD-15B"}, {"id": "0041280629", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:55", "cli": "1", "av": "2", "tipo": "FALTA EM CLIENTE VITAL", "vtr": "JZU-RD-14B"}, {"id": "0041280661", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:51", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": "MLM-RD-16B"}, {"id": "0041280729", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:41", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "CPN-RD-90B"}, {"id": "0041280735", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:41", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPA-RD-90B"}, {"id": "0041280765", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:36", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZN-LB-11B"}, {"id": "0041280909", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:10", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "MLJ-RD-17B"}, {"id": "0041280915", "est": "NOVA", "area": "CRATO", "dur": "2:09", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041280917", "est": "NOVA", "area": "JUAZEIRO", "dur": "2:09", "cli": "26", "av": "31", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041280927", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:08", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPS-RD-90B"}, {"id": "0041280963", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:02", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZN-LB-15B"}, {"id": "0041280971", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:02", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLV-RD-12B"}, {"id": "0041281043", "est": "NOVA", "area": "MILAGRES", "dur": "1:53", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": ""}, {"id": "0041281055", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "1:52", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "JZN-RD-15B"}, {"id": "0041281065", "est": "NOVA", "area": "ICO", "dur": "1:50", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041281127", "est": "RECEBIDA", "area": "C. SALES", "dur": "1:40", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPS-RD-90B"}, {"id": "0041281153", "est": "RECEBIDA", "area": "MILAGRES", "dur": "1:36", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLM-RD-16B"}, {"id": "0041281165", "est": "NOVA", "area": "CRATO", "dur": "1:34", "cli": "0", "av": "3", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": ""}, {"id": "0041281199", "est": "NOVA", "area": "MILAGRES", "dur": "1:28", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281305", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "1:11", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-EX-91B"}, {"id": "0041281389", "est": "NOVA", "area": "MILAGRES", "dur": "0:59", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281391", "est": "NOVA", "area": "CRATO", "dur": "0:59", "cli": "1", "av": "2", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041281403", "est": "RECEBIDA", "area": "MILAGRES", "dur": "0:57", "cli": "1", "av": "2", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "MLV-RD-12B"}, {"id": "0041281497", "est": "NOVA", "area": "CRATO", "dur": "0:46", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281527", "est": "NOVA", "area": "MILAGRES", "dur": "0:42", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281581", "est": "NOVA", "area": "C. SALES", "dur": "0:35", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": ""}, {"id": "0041281747", "est": "NOVA", "area": "C. SALES", "dur": "0:13", "cli": "1", "av": "1", "tipo": "VEGETACAO SOBRE A REDE", "vtr": ""}, {"id": "0041281755", "est": "NOVA", "area": "C. SALES", "dur": "0:12", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041281825", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:02", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}];
 
 function durMin(d){const p=(d||'0:0').split(':');return parseInt(p[0])*60+parseInt(p[1]);}
 
@@ -539,14 +548,32 @@ function renderTabelaLive(area){
   if(count) count.textContent=lista.length;
   const tbody=document.getElementById('tbody');
   if(!tbody) return;
-  tbody.innerHTML=lista.map(d=>{
+  tbody.innerHTML=lista.map((d,i)=>{
     const urg=URGENTES_SET.has(d.tipo);
     const longa=durMin(d.dur)>120;
     const badge=d.est==='NOVA'?'bdg-n':'bdg-r';
     const cor=AREA_COR[d.area]||'#888';
     const av=parseInt(d.av)||0;
-    return `<tr class="${urg?'urg':''}">
-      <td class="mono">${d.id}</td>
+    const rowId='row-'+i;
+    const obsId='obs-'+i;
+
+    // Botão Google Maps
+    const mapBtn = d.gps
+      ? `<a class="btn-map" href="https://www.google.com/maps?q=${d.gps}" target="_blank" title="Abrir no Google Maps">📍</a>`
+      : '';
+
+    // Botão observação
+    const obsBtn = d.obs
+      ? `<button class="btn-obs" onclick="toggleObs('${obsId}')" title="Ver observação do cliente">💬</button>`
+      : '';
+
+    // Linha de observação
+    const obsRow = d.obs
+      ? `<tr id="${obsId}" class="obs-row"><td colspan="8">💬 ${d.obs}</td></tr>`
+      : '';
+
+    return `<tr class="${urg?'urg':''}" id="${rowId}">
+      <td><div class="id-cell"><span class="mono">${d.id}</span>${mapBtn}${obsBtn}</div></td>
       <td><span class="bdg ${badge}">${d.est}</span></td>
       <td><span class="adot" style="background:${cor}"></span><span style="font-size:11.5px">${d.area}</span></td>
       <td class="${longa?'dur-hi':'dur-ok'}">${d.dur}</td>
@@ -555,7 +582,7 @@ function renderTabelaLive(area){
       <td class="trunc" style="font-size:11.5px${urg?';color:var(--red);font-weight:500':''}">
         ${urg?'⚠ ':''}${d.tipo}</td>
       <td>${vtrTag(d.vtr,true)}</td>
-    </tr>`;
+    </tr>${obsRow}`;
   }).join('');
 }
 
@@ -569,6 +596,14 @@ function filtrar(area){
 }
 
 let filtroAtivo='Todas';
+
+function toggleObs(id){
+  const row = document.getElementById(id);
+  if(!row) return;
+  row.classList.toggle('show');
+  const btn = row.previousElementSibling.querySelector('.btn-obs');
+  if(btn) btn.classList.toggle('active', row.classList.contains('show'));
+}
 
 async function buscarDados(){
   try{
