@@ -27,7 +27,7 @@ except ImportError:
 # ─── CONFIGURAÇÃO ────────────────────────────────────────────────
 USUARIO           = "BR0894369203"
 SENHA             = "none"
-INTERVALO_MINUTOS = 2
+INTERVALO_MINUTOS = 1
 URL_LOGIN         = "https://temporealce.enel.com/sgt/"
 PASTA_SAIDA       = os.path.dirname(os.path.abspath(__file__))
 # ─────────────────────────────────────────────────────────────────
@@ -48,11 +48,16 @@ def iniciar_driver():
     opts.add_argument("--disable-notifications")
     opts.add_argument("--password-store=basic")
     opts.add_argument("--disable-save-password-bubble")
+    opts.add_argument("--log-level=3")
+    opts.add_argument("--silent")
+    opts.add_argument(f"--user-data-dir={os.path.join(PASTA_SAIDA, 'chrome_profile')}")
     opts.add_experimental_option("prefs", {
         "credentials_enable_service": False,
         "profile.password_manager_enabled": False,
         "profile.password_manager_leak_detection": False,
+        "profile.default_content_setting_values.notifications": 2,
     })
+    opts.add_experimental_option("excludeSwitches", ["enable-logging"])
     opts.add_argument("--no-sandbox")
     opts.add_argument("--disable-dev-shm-usage")
     opts.add_argument("--disable-gpu")
@@ -122,27 +127,52 @@ def entrar_no_frame_com(driver, condicao):
 
 def fechar_popup_senha(driver):
     """Fecha popup do Chrome sobre senha comprometida, se aparecer."""
-    for xpath in [
-        "//button[normalize-space()='Fechar']",
-        "//button[contains(normalize-space(),'Fechar')]",
-        "//button[normalize-space()='Close']",
-    ]:
+    from selenium.webdriver.common.keys import Keys
+
+    for tentativa in range(3):
+        # Tenta via JavaScript no shadow DOM do Chrome
         try:
-            driver.switch_to.default_content()
-            btn = WebDriverWait(driver, 3).until(
-                EC.element_to_be_clickable((By.XPATH, xpath)))
-            btn.click()
-            print("[✓] Popup senha fechado")
-            time.sleep(1)
-            return
+            fechado = driver.execute_script("""
+                const dialogs = document.querySelectorAll('password-manager-dialog, [slot="content"]');
+                for(const d of dialogs){
+                    const btn = d.shadowRoot && d.shadowRoot.querySelector('cr-button');
+                    if(btn){ btn.click(); return true; }
+                }
+                return false;
+            """)
+            if fechado:
+                print("[✓] Popup senha fechado via JS")
+                time.sleep(0.5)
+                return
         except:
-            continue
-    try:
-        from selenium.webdriver.common.keys import Keys
-        driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+            pass
+
+        # Tenta via Selenium
+        for xpath in [
+            "//button[normalize-space()='Fechar']",
+            "//button[contains(normalize-space(),'Fechar')]",
+            "//button[normalize-space()='Close']",
+            "//button[contains(@class,'cancel')]",
+        ]:
+            try:
+                driver.switch_to.default_content()
+                btn = WebDriverWait(driver, 2).until(
+                    EC.element_to_be_clickable((By.XPATH, xpath)))
+                btn.click()
+                print("[✓] Popup senha fechado")
+                time.sleep(0.5)
+                return
+            except:
+                continue
+
+        # Escape
+        try:
+            driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+            time.sleep(0.5)
+        except:
+            pass
+
         time.sleep(1)
-    except:
-        pass
 
 
 def fazer_login(driver):
@@ -254,6 +284,7 @@ def navegar_e_extrair(driver, primeira_vez=False):
     Demais : Total → extrai → VOLTAR  (já na tela do DESUL)
     """
     driver.switch_to.default_content()
+    fechar_popup_senha(driver)  # fecha popup se aparecer entre ciclos
     if primeira_vez:
         clicar_desul(driver)
         clicar_total(driver)
@@ -307,6 +338,35 @@ def parsear_incidencias(html):
             continue
         if any("Nº Incidência" in c.get_text(strip=True) for c in cel):
             continue
+        # Extrai coordenada cliente
+        coord_raw = get(row, "Coordenada Cliente")
+        gps = ""
+        if coord_raw and "," in coord_raw:
+            partes = coord_raw.strip().split(",")
+            if len(partes) >= 2:
+                try:
+                    lat = float(partes[0].strip())
+                    lng = float(partes[1].strip())
+                    gps = f"{lat},{lng}"
+                except:
+                    pass
+
+        # Observação cliente — extrai texto após "TL: LIGAÇÃO XX "
+        obs_raw = get(row, "Observação Cliente")
+        obs = ""
+        if obs_raw:
+            import re as _re
+            # Extrai texto após "TL: LIGAÇÃO MONOFASICA " ou "TL: LIGAÇÃO TRIFASICA "
+            # Extrai texto apos TL: LIGACAO
+            for prefix in ['TL: LIGAÇÃO TRIFASICA ', 'TL: LIGAÇÃO MONOFASICA ', 'TL: LIGACAO ']:
+                if prefix in obs_raw:
+                    obs = obs_raw.split(prefix, 1)[1].strip()
+                    # Remove linha de contato se houver
+                    if chr(10)+'Contato' in obs:
+                        obs = obs[:obs.find(chr(10)+'Contato')].strip()
+                    obs = obs[:250]
+                    break
+
         inc = {
             "id":      get(row, "Incidência"),
             "viatura": get(row, "Viatura"),
@@ -316,6 +376,8 @@ def parsear_incidencias(html):
             "area":    get(row, "Área Despacho") or get(row, "Área"),
             "tipo":    get(row, "Tipo Reclamação") or get(row, "Tipo"),
             "avisos":  get(row, "Total Avisos") or "1",
+            "gps":     gps,
+            "obs":     obs,
         }
         if inc["id"]:
             incidencias.append(inc)
@@ -362,6 +424,8 @@ def salvar_painel(incidencias):
             "av":   inc.get("avisos") or "1",
             "tipo": inc["tipo"] or "",
             "vtr":  inc["viatura"] or "",
+            "gps":  inc.get("gps") or "",
+            "obs":  (inc.get("obs") or "").replace("\n", " ").replace("\r", " ").replace('"', "'").strip(),
         })
 
     painel_path = os.path.join(PASTA_SAIDA, "painel_sgt.html")
@@ -369,12 +433,12 @@ def salvar_painel(incidencias):
         with open(painel_path, "r", encoding="utf-8") as f:
             html = f.read()
 
-        dados_json = json.dumps(dados, ensure_ascii=False)
+        dados_json = json.dumps(dados, ensure_ascii=True)
 
         # Substitui const dados=[...];
         novo_html = re.sub(
             r"const dados\s*=\s*\[.*?\]\s*;",
-            "const dados=" + dados_json + ";",
+            lambda m: "const dados=" + dados_json + ";",
             html, flags=re.DOTALL
         )
         if novo_html == html:
@@ -579,7 +643,7 @@ def salvar_painel(incidencias):
             "dados": dados,
         }
         with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(payload, f, ensure_ascii=False)
+            json.dump(payload, f, ensure_ascii=True)
 
         print(f"[✓] Painel atualizado — {len(dados)} incidências  ({agora})")
     except Exception as e:
@@ -607,23 +671,63 @@ def main():
         print(f"\n[{datetime.now().strftime('%H:%M:%S')}] Iteração #{iteracao}")
         try:
             html_pagina = navegar_e_extrair(driver, primeira_vez=(iteracao == 1))
-            incidencias = parsear_incidencias(html_pagina)
-            if incidencias:
-                salvar_painel(incidencias)
-                publicar_github()
+            # Valida se capturou a tela certa pelo cabeçalho
+            tela_certa = "Nº Incidência" in html_pagina or "N° Incidência" in html_pagina or "INCIDÊNCIA" in html_pagina.upper()
+            tela_errada = any(x in html_pagina for x in ["Distribuição", "Comarca", "GER DIST."])
+
+            if tela_certa and not tela_errada:
+                incidencias = parsear_incidencias(html_pagina)
+                if incidencias:
+                    salvar_painel(incidencias)
+                    publicar_github()
+                else:
+                    print("[!] Nenhuma incidência extraída — mantendo dados anteriores")
             else:
-                print("[!] Nenhuma incidência extraída")
-                salvar_dump(driver, "dump_sem_dados.html")
-        except Exception as e:
-            print(f"[ERRO] {e}")
-            traceback.print_exc()
-            iteracao = 0
-            try:
-                driver.get(URL_LOGIN)
+                print("[!] Tela errada capturada — reiniciando Chrome do zero...")
+                salvar_dump(driver, "dump_tela_errada.html")
+                try:
+                    driver.quit()
+                except:
+                    pass
                 time.sleep(3)
+                driver = iniciar_driver()
                 fazer_login(driver)
-            except Exception as e2:
-                print(f"[ERRO login] {e2}")
+                iteracao = 0
+                print("[✓] Chrome reiniciado — próximo ciclo vai navegar do zero")
+        except Exception as e:
+            msg = str(e)
+            print(f"[ERRO] {msg[:200]}")
+
+            # Se sessão morreu (Chrome fechou), reinicia tudo do zero
+            sessao_morta = any(x in msg for x in [
+                "invalid session id", "session deleted", "NewConnectionError",
+                "Max retries exceeded", "ConnectionRefusedError", "Failed to establish"
+            ])
+
+            if sessao_morta:
+                print("[!] Sessão do Chrome morreu — reiniciando do zero...")
+                try:
+                    driver.quit()
+                except:
+                    pass
+                time.sleep(3)
+                try:
+                    driver = iniciar_driver()
+                    fazer_login(driver)
+                    iteracao = 0
+                    print("[✓] Chrome reiniciado com sucesso")
+                except Exception as e2:
+                    print(f"[ERRO ao reiniciar] {e2}")
+                    time.sleep(10)
+            else:
+                # Erro leve — tenta só refazer login
+                iteracao = 0
+                try:
+                    driver.get(URL_LOGIN)
+                    time.sleep(3)
+                    fazer_login(driver)
+                except Exception as e2:
+                    print(f"[ERRO login] {e2}")
 
         if run_once:
             print("[i] --once: encerrando")

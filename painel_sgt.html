@@ -348,6 +348,59 @@ function renderTudo(){
   }).join('');
 
   window._dadosAtuais = dados;
+function renderTabelaLive(area){
+  const lista=area==='Todas'?window._dadosAtuais:(window._dadosAtuais||[]).filter(d=>d.area===area);
+  const count=document.getElementById('tbl-count');
+  if(count) count.textContent=lista.length;
+  const tbody=document.getElementById('tbody');
+  if(!tbody) return;
+  tbody.innerHTML=lista.map((d,i)=>{
+    const urg=URGENTES.includes((d.tipo||'').toUpperCase());
+    const longa=durMin(d.dur)>120;
+    const badge=d.est==='NOVA'?'bdg-n':'bdg-r';
+    const cor=AREA_COR[d.area]||'#888';
+    const av=parseInt(d.av)||0;
+    const rowId='row-'+i;
+    const obsId='obs-'+i;
+
+    // Botão Google Maps
+    const mapBtn = d.gps
+      ? `<a class="btn-map" href="https://www.google.com/maps?q=${d.gps}" target="_blank" title="Abrir no Google Maps">📍</a>`
+      : '';
+
+    // Botão observação
+    const obsBtn = d.obs
+      ? `<button class="btn-obs" onclick="toggleObs('${obsId}')" title="Ver observacao do cliente">💬</button>`
+      : '';
+
+    // Linha de observação
+    const obsRow = d.obs
+      ? `<tr id="${obsId}" class="obs-row"><td colspan="8">💬 ${d.obs}</td></tr>`
+      : '';
+
+    return `<tr class="${urg?'urg':''}" id="${rowId}">
+      <td><div class="id-cell"><span class="mono">${d.id}</span>${mapBtn}${obsBtn}</div></td>
+      <td><span class="bdg ${badge}">${d.est}</span></td>
+      <td><span class="adot" style="background:${cor}"></span><span style="font-size:11.5px">${d.area}</span></td>
+      <td class="${longa?'dur-hi':'dur-ok'}">${d.dur}</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:11.5px">${d.cli||'—'}</td>
+      <td style="text-align:center"><span class="${av>=5?'av-hi':'av-ok'}">${d.av}</span></td>
+      <td class="trunc" style="font-size:11.5px${urg?';color:var(--red);font-weight:500':''}">
+        ${urg?'⚠ ':''}${d.tipo}</td>
+function vtrTag(v, small=false){
+  if(!v) return '<span style="font-size:10.5px;color:var(--orange)">⚠ sem equipe</span>';
+  const p=COSAMPA_PROC[v];
+  const cls=p==='em'?'vtr-em':p==='co'?'vtr-co':p==='ml'?'vtr-ml':'vtr-el';
+  const title=p==='em'?'Cosampa Emergencial':p==='co'?'Cosampa Comercial':p==='ml'?'Cosampa Manutencao':'Enel / não identificada';
+  const sz=small?'font-size:9.5px;padding:1px 6px;':'';
+  return `<span class="vtr ${cls}" style="${sz}" title="${title}">${v}</span>`;
+}
+
+      <td>${vtrTag(d.vtr,true)}</td>
+    </tr>${obsRow}`;
+  }).join('');
+}
+
   renderTabelaLive(filtroAtivo);
 }
 
@@ -389,14 +442,7 @@ renderTudo();
 const DADOS_URL = 'https://igorbezerra9-svg.github.io/Painel-Ocorr-ncias-Cosampa/dados.json';
 let ultimoAtualizado = null;
 
-function vtrTag(v, small=false){
-  if(!v) return '<span style="font-size:10.5px;color:var(--orange)">⚠ sem equipe</span>';
-  const p=COSAMPA_PROC[v];
-  const cls=p==='em'?'vtr-em':p==='co'?'vtr-co':p==='ml'?'vtr-ml':'vtr-el';
-  const title=p==='em'?'Cosampa Emergencial':p==='co'?'Cosampa Comercial':p==='ml'?'Cosampa Manutencao':'Enel / não identificada';
-  const sz=small?'font-size:9.5px;padding:1px 6px;':'';
-  return `<span class="vtr ${cls}" style="${sz}" title="${title}">${v}</span>`;
-}
+// vtrTag movida
 
 function atualizarPainel(payload){
   const dados = payload.dados;
@@ -478,49 +524,7 @@ function atualizarPainel(payload){
   if(ht) ht.textContent=agora;
 }
 
-function renderTabelaLive(area){
-  const lista=area==='Todas'?window._dadosAtuais:(window._dadosAtuais||[]).filter(d=>d.area===area);
-  const count=document.getElementById('tbl-count');
-  if(count) count.textContent=lista.length;
-  const tbody=document.getElementById('tbody');
-  if(!tbody) return;
-  tbody.innerHTML=lista.map((d,i)=>{
-    const urg=URGENTES.includes((d.tipo||'').toUpperCase());
-    const longa=durMin(d.dur)>120;
-    const badge=d.est==='NOVA'?'bdg-n':'bdg-r';
-    const cor=AREA_COR[d.area]||'#888';
-    const av=parseInt(d.av)||0;
-    const rowId='row-'+i;
-    const obsId='obs-'+i;
-
-    // Botão Google Maps
-    const mapBtn = d.gps
-      ? `<a class="btn-map" href="https://www.google.com/maps?q=${d.gps}" target="_blank" title="Abrir no Google Maps">📍</a>`
-      : '';
-
-    // Botão observação
-    const obsBtn = d.obs
-      ? `<button class="btn-obs" onclick="toggleObs('${obsId}')" title="Ver observacao do cliente">💬</button>`
-      : '';
-
-    // Linha de observação
-    const obsRow = d.obs
-      ? `<tr id="${obsId}" class="obs-row"><td colspan="8">💬 ${d.obs}</td></tr>`
-      : '';
-
-    return `<tr class="${urg?'urg':''}" id="${rowId}">
-      <td><div class="id-cell"><span class="mono">${d.id}</span>${mapBtn}${obsBtn}</div></td>
-      <td><span class="bdg ${badge}">${d.est}</span></td>
-      <td><span class="adot" style="background:${cor}"></span><span style="font-size:11.5px">${d.area}</span></td>
-      <td class="${longa?'dur-hi':'dur-ok'}">${d.dur}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:11.5px">${d.cli||'—'}</td>
-      <td style="text-align:center"><span class="${av>=5?'av-hi':'av-ok'}">${d.av}</span></td>
-      <td class="trunc" style="font-size:11.5px${urg?';color:var(--red);font-weight:500':''}">
-        ${urg?'⚠ ':''}${d.tipo}</td>
-      <td>${vtrTag(d.vtr,true)}</td>
-    </tr>${obsRow}`;
-  }).join('');
-}
+// renderTabelaLive movida para cima
 
 function toggleObs(id){
   const row = document.getElementById(id);
