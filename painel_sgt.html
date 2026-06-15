@@ -139,14 +139,39 @@ td{padding:7px 11px;vertical-align:middle}
 .av-ok{font-family:'DM Mono',monospace;color:var(--muted2)}
 .vtag{font-size:9.5px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:3px;border:1px solid;display:inline-block}
 
+.tabs{display:flex;gap:4px;background:var(--s2);border-radius:6px;padding:3px;border:1px solid var(--border)}
+.tab-btn{font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;padding:5px 14px;border-radius:4px;border:none;background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.on{background:var(--s1);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.1)}
+:root.light .tab-btn.on{background:#fff}
+
+.map-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px}
+.map-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.map-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted2)}
+.map-leg-item{display:flex;align-items:center;gap:5px}
+.map-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,0.3)}
+.map-pin-leg{font-size:12px}
+#map{width:100%;height:calc(100vh - 180px);min-height:560px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--s2)}
+.map-popup{font-family:'DM Sans',sans-serif;font-size:12.5px;min-width:220px}
+.map-popup .mp-id{font-family:'DM Mono',monospace;font-weight:600;font-size:13px;margin-bottom:4px;color:#1f2937}
+.map-popup .mp-row{display:flex;justify-content:space-between;gap:10px;padding:2px 0;color:#374151}
+.map-popup .mp-row b{color:#111827}
+.map-popup .mp-tipo{margin-top:4px;padding-top:4px;border-top:1px solid #e5e7eb;font-weight:500;color:#111827}
+.map-popup .mp-obs{margin-top:4px;padding-top:4px;border-top:1px solid #e5e7eb;font-style:italic;color:#6b7280;font-size:11.5px;line-height:1.4}
+.map-popup .mp-urg{color:#dc2626;font-weight:600}
+.div-icon-car{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.4);font-size:15px}
+.div-icon-pin{display:flex;align-items:center;justify-content:center;width:28px;height:28px;font-size:24px;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.4))}
+
 @media(max-width:900px){
   .metrics,.areas{grid-template-columns:repeat(2,1fr)}
   .wrap{padding:.9rem}
   .hdr{padding:.75rem 1rem}
 }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 </head>
 <body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <header class="hdr">
   <div class="hdr-l">
     <div class="pulse"></div>
@@ -156,16 +181,21 @@ td{padding:7px 11px;vertical-align:middle}
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:10px">
+    <div class="tabs">
+      <button class="tab-btn on" onclick="switchView('painel')" id="tab-painel">Painel</button>
+      <button class="tab-btn" onclick="switchView('mapa')" id="tab-mapa">Mapa</button>
+    </div>
     <button class="theme-btn" onclick="toggleTheme()" title="Alternar tema">
       <span id="theme-icon">☀️</span>
       <span id="theme-label">Claro</span>
     </button>
     <span class="chip-live">● ao vivo</span>
-    <span class="hdr-time" id="hdr-time">10/06/2026 17:18:43</span>
+    <span class="hdr-time" id="hdr-time">12/06/2026 17:20:49</span>
   </div>
 </header>
 
 <div class="wrap">
+<div id="view-painel">
   <div class="metrics">
     <div class="met met-blue">
       <div class="met-num" id="val-total">—</div>
@@ -223,6 +253,21 @@ td{padding:7px 11px;vertical-align:middle}
   </div>
 </div>
 
+<div id="view-mapa" style="display:none">
+  <div class="map-card">
+    <div class="map-toolbar">
+      <span class="tbl-label">Mapa de Incidências</span>
+      <div class="map-legend">
+        <span class="map-leg-item"><span class="div-icon-car" style="width:16px;height:16px;font-size:9px;background:#888">🚗</span>Cada viatura tem uma cor própria</span>
+        <span class="map-leg-item"><span class="map-pin-leg">📍</span>Sem equipe atribuída</span>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+</div>
+
+</div>
+
 <script>
 const AREA_COR={'MILAGRES':'#10b981','CRATO':'#f97316','C. SALES':'#f59e0b','JUAZEIRO':'#3b82f6','ICO':'#8b5cf6'};
 const AREA_NAMES={'C. SALES':'Campos Sales','MILAGRES':'Milagres','JUAZEIRO':'Juazeiro do Norte','CRATO':'Crato','ICO':'Icó'};
@@ -273,7 +318,7 @@ const COSAMPA_PROC={
 const VTR_CLS={'em':'vtr-em','co':'vtr-co','ml':'vtr-ml','ob':'vtr-co'};
 const VTR_TITLE={'em':'Cosampa Emergencial','co':'Cosampa Comercial','ml':'Cosampa Manutencao','ob':'Cosampa Obras'};
 
-const dados=[{"id": "0041308049", "est": "NOVA", "area": "MILAGRES", "dur": "8:47", "cli": "2", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041308883", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "7:05", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": ""}, {"id": "0041309103", "est": "RECEBIDA", "area": "MILAGRES", "dur": "6:39", "cli": "1", "av": "3", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-RD-19C"}, {"id": "0041309647", "est": "RECEBIDA", "area": "MILAGRES", "dur": "5:35", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLS-RD-12C"}, {"id": "0041309821", "est": "RECEBIDA", "area": "C. SALES", "dur": "5:09", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "CPS-TR-11C"}, {"id": "0041310137", "est": "RECEBIDA", "area": "MILAGRES", "dur": "4:20", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "MLM-RD-14C"}, {"id": "0041310183", "est": "RECEBIDA", "area": "MILAGRES", "dur": "4:12", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "MLM-RD-14C"}, {"id": "0041310291", "est": "RECEBIDA", "area": "C. SALES", "dur": "3:54", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "CPA-RD-90B"}, {"id": "0041310371", "est": "NOVA", "area": "JUAZEIRO", "dur": "3:40", "cli": "1", "av": "1", "tipo": "CONDUTOR DESNIVELADO OU TRANÇADO", "vtr": ""}, {"id": "0041310539", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "3:20", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-SK-11C"}, {"id": "0041310779", "est": "NOVA", "area": "CRATO", "dur": "2:52", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041310851", "est": "NOVA", "area": "JUAZEIRO", "dur": "2:44", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041310869", "est": "NOVA", "area": "MILAGRES", "dur": "2:42", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": "MLS-EN-01C"}, {"id": "0041310923", "est": "NOVA", "area": "C. SALES", "dur": "2:39", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": ""}, {"id": "0041310953", "est": "RECEBIDA", "area": "C. SALES", "dur": "2:35", "cli": "12", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPR-RD-12B"}, {"id": "0041311011", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "2:30", "cli": "1", "av": "1", "tipo": "VEGETACAO SOBRE A REDE", "vtr": "JZN-SK-11C"}, {"id": "0041311321", "est": "NOVA", "area": "MILAGRES", "dur": "1:53", "cli": "9", "av": "2", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041311351", "est": "RECEBIDA", "area": "C. SALES", "dur": "1:50", "cli": "1", "av": "3", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "CPA-RD-13D"}, {"id": "0041311363", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:50", "cli": "1", "av": "1", "tipo": "POSTE DANIFICADO", "vtr": ""}, {"id": "0041311387", "est": "NOVA", "area": "C. SALES", "dur": "1:46", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041311399", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:45", "cli": "0", "av": "1", "tipo": "INCÊNDIO", "vtr": ""}, {"id": "0041311431", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:42", "cli": "1", "av": "1", "tipo": "POSTE DANIFICADO", "vtr": ""}, {"id": "0041311437", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:41", "cli": "1", "av": "1", "tipo": "VEGETACAO SOBRE A REDE", "vtr": ""}, {"id": "0041311453", "est": "NOVA", "area": "CRATO", "dur": "1:40", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041311521", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:32", "cli": "47", "av": "1", "tipo": "OSCILACAO", "vtr": ""}, {"id": "0041311549", "est": "NOVA", "area": "CRATO", "dur": "1:30", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": ""}, {"id": "0041311625", "est": "NOVA", "area": "CRATO", "dur": "1:20", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041311691", "est": "NOVA", "area": "C. SALES", "dur": "1:12", "cli": "0", "av": "1", "tipo": "INCÊNDIO", "vtr": ""}, {"id": "0041311751", "est": "NOVA", "area": "CRATO", "dur": "1:06", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041311785", "est": "NOVA", "area": "CRATO", "dur": "1:03", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041311795", "est": "NOVA", "area": "MILAGRES", "dur": "1:01", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041311889", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:50", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": ""}, {"id": "0041311931", "est": "NOVA", "area": "CRATO", "dur": "0:43", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": ""}, {"id": "0041312021", "est": "RECEBIDA", "area": "MILAGRES", "dur": "0:29", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLB-RD-13C"}, {"id": "0041312055", "est": "NOVA", "area": "CRATO", "dur": "0:24", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": ""}, {"id": "0041312075", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:20", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}, {"id": "0041312193", "est": "NOVA", "area": "C. SALES", "dur": "0:02", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": ""}];
+const dados=[{"id": "0041322263", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "9:53", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-SK-11C", "gps": "-7.21009103,-39.34262206", "obs": "est\u00e1 no disjuntor apenas uma luz vermelha ligada"}, {"id": "0041322315", "est": "NOVA", "area": "CRATO", "dur": "9:42", "cli": "3", "av": "5", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.08841347,-39.35884007", "obs": "CLT RECLAMA QUE ESTA SEM ENERGIA NO LOCAL E DESEJA O REPARO COM URGENCIA. TEL: 88996864884 RF: PX A CAPELA SANTA LUZIA"}, {"id": "0041322467", "est": "NOVA", "area": "MILAGRES", "dur": "9:21", "cli": "0", "av": "1", "tipo": "TROCA DE DISJUNTOR", "vtr": "MLS-EN-01C", "gps": "-7.55788072,-39.16878061", "obs": "CLT INF QUE O DISJUNTOR DISPAROU E QUEIMOU, COMPROU UM NOVO. PROX A IGREJA EVANGELICA. TEL88988001587. PROC NEIDE DE RAFAEL."}, {"id": "0041322707", "est": "RECEBIDA", "area": "MILAGRES", "dur": "8:51", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.65243844,-39.26935133", "obs": "."}, {"id": "0041322823", "est": "RECEBIDA", "area": "C. SALES", "dur": "8:39", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPA-RD-90B", "gps": "-6.89015458,-40.20178767", "obs": "."}, {"id": "0041323069", "est": "NOVA", "area": "MILAGRES", "dur": "8:13", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "", "gps": "-7.17068944,-38.77778417", "obs": "em media de  3 dias cliente relata que sua energia esta oscilando as luzes estao piscando porem hoje piorou , nao liga nem a geladaira nem ventiladores tel  88996160453 fala com francisco dias ref em frente a l"}, {"id": "0041323193", "est": "NOVA", "area": "MILAGRES", "dur": "8:02", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.38258742,-39.02414854", "obs": "."}, {"id": "0041323217", "est": "RECEBIDA", "area": "MILAGRES", "dur": "8:00", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": "JZN-RD-19C", "gps": "-7.30948364,-38.93220488", "obs": "sr Manoel nogueira inf que teve um fogo no fio terra solic verificar ref em frente a leite nas cabeceiras de baixo px cs do sobrinho de fernando sampaio proc a cs de manoel nogueira px a cs de dezim morais tel"}, {"id": "0041323373", "est": "NOVA", "area": "CRATO", "dur": "7:41", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.26488929,-39.45638726", "obs": "#ENELRESOLVE  Cliente informa que esta tendo quedas de energia constante e no momento esta sem energia  tel:88999867772"}, {"id": "0041323421", "est": "RECEBIDA", "area": "MILAGRES", "dur": "7:35", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "JZN-RD-19C", "gps": "-7.35579818,-38.85540754", "obs": "falta de energia ref viz a cs de joaquim biror proc a cs de ivo proc regis no local tel 88994513777 px a caixa dagua"}, {"id": "0041323509", "est": "NOVA", "area": "C. SALES", "dur": "8:17", "cli": "103", "av": "7", "tipo": "CONSUMIDOR ESPECIAL", "vtr": "CPS-RD-90B", "gps": "", "obs": "Cliente informa falta de fase no estabelecimento"}, {"id": "0041323519", "est": "NOVA", "area": "C. SALES", "dur": "7:23", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.13602426,-40.32118328", "obs": "."}, {"id": "0041323797", "est": "NOVA", "area": "C. SALES", "dur": "6:50", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.07574663,-40.37498397", "obs": "."}, {"id": "0041323825", "est": "NOVA", "area": "C. SALES", "dur": "6:47", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "", "gps": "-7.25814251,-40.43899675", "obs": "cliente informa que a fia\u00e7ao esta partida e pegou fogo mas no momento o esta partida"}, {"id": "0041323915", "est": "NOVA", "area": "C. SALES", "dur": "6:35", "cli": "0", "av": "1", "tipo": "TROCA DE DISJUNTOR", "vtr": "", "gps": "-6.9999782,-39.7411861", "obs": ""}, {"id": "0041324149", "est": "RECEBIDA", "area": "C. SALES", "dur": "6:11", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": "CPA-RD-13D", "gps": "", "obs": "CLT CICERO SOL EQUIPE NO LOCAL COM URGENCIA POIS RELATA QUE ESTA COM BAIXA TENSAO PROX MANEL DE LIRO E SERGIO GOIABINHA x ENTRADA DE ARAUJO x TEL 97991170905"}, {"id": "0041324289", "est": "NOVA", "area": "ICO", "dur": "5:55", "cli": "1", "av": "1", "tipo": "TENS\u00c3O BAIXA/ALTA", "vtr": "", "gps": "-6.88246636,-38.73622092", "obs": "Cliente reclama que a tens\u00e3o est\u00e1 muitoo baixa, n\u00e3o consegue nem ligar os seus motores, ref px ao acude do melao proc dida tel 88999980259"}, {"id": "0041324449", "est": "NOVA", "area": "MILAGRES", "dur": "5:33", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "", "gps": "-7.24187582,-39.1423909", "obs": "cliente informa oscila\u00e7\u00e3o de energia . e informa que ontem verificou faiscas saindo do poste de sua resid\u00eancia"}, {"id": "0041324537", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "5:18", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.23017631,-39.29865981", "obs": "cliente  relata  que desde   o dia 11/06  est\u00e1 sem  energia   somente  na  casa dele  ,"}, {"id": "0041324607", "est": "NOVA", "area": "ICO", "dur": "5:08", "cli": "27", "av": "8", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-6.72923681,-38.6894873", "obs": "CLIENTE INFORMA FALTA DE NEGIA EM VARIAS CASAS; CLIENTE INFORMA QUE CHEGOUA FALTAR NA NOITE ANTERIOR, A EQUIPE FOI AO LOCAL MAS O PROBLEMA TORNOU A ACONTECER"}, {"id": "0041324655", "est": "RECEBIDA", "area": "MILAGRES", "dur": "5:03", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLM-RD-14C", "gps": "-7.42454197,-38.84316935", "obs": "falta de energia desde ontem somente em meu poste"}, {"id": "0041324657", "est": "NOVA", "area": "CRATO", "dur": "5:02", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "", "gps": "-7.23092764,-39.40364421", "obs": ""}, {"id": "0041324753", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "4:51", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": "JZN-SK-11C", "gps": "", "obs": "cliente informa que ainda estas energia ap\u00f3s a troca"}, {"id": "0041324759", "est": "NOVA", "area": "CRATO", "dur": "4:50", "cli": "264", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.24086658,-39.39589009", "obs": "."}, {"id": "0041324783", "est": "NOVA", "area": "CRATO", "dur": "4:46", "cli": "131", "av": "5", "tipo": "TENS\u00c3O BAIXA/ALTA", "vtr": "", "gps": "", "obs": "OSCILA\u00c7\u00c3O ,N\u00c3O CHEGA AS 3 FAZES DESDE 9:00 HORAS"}, {"id": "0041324881", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "4:31", "cli": "1", "av": "1", "tipo": "TENS\u00c3O BAIXA/ALTA", "vtr": "JZN-SK-11C", "gps": "-7.23460611,-39.28869863", "obs": "CLIENTE INFORMA QUE TENS\u00c3O DA ENERGIA EST\u00c1 ALTA E ENERGIA EST\u00c1 FORTE CAUSANDO DANO A APARELHOS DOS CLIENTES"}, {"id": "0041325007", "est": "NOVA", "area": "JUAZEIRO", "dur": "4:07", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.20772399,-39.28567441", "obs": "."}, {"id": "0041325155", "est": "NOVA", "area": "MILAGRES", "dur": "3:45", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "", "gps": "-7.65386344,-39.28978899", "obs": "CLT INF QUE TEVER UMA FAISCA NO POSTE E FALTOU ENERGIA NA UC E NAO SOUBE INF SE TEM RISCO"}, {"id": "0041325309", "est": "NOVA", "area": "CRATO", "dur": "3:26", "cli": "1", "av": "1", "tipo": "VEGETACAO SOBRE A REDE", "vtr": "", "gps": "-7.22966441,-39.36783647", "obs": "ARVORES E GALHOS SOBRE A FIA\u00c7\u00c3O"}, {"id": "0041325323", "est": "NOVA", "area": "JUAZEIRO", "dur": "3:24", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "", "gps": "-7.19971838,-39.27095987", "obs": "cliente relata quedas de energia ap\u00f3s ligar os aparelhos  solicita comparecimento"}, {"id": "0041325341", "est": "NOVA", "area": "C. SALES", "dur": "3:23", "cli": "1", "av": "1", "tipo": "TENS\u00c3O BAIXA/ALTA", "vtr": "", "gps": "-7.07277055,-40.3752558", "obs": "sra rita reclama que a tensao esta muito fraca e oscilando diariamente  por tras da igreja matriz  procurar rita ribeiro 88999473171"}, {"id": "0041325349", "est": "NOVA", "area": "CRATO", "dur": "3:23", "cli": "1", "av": "4", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.23000759,-39.41085362", "obs": "energia fraca"}, {"id": "0041325381", "est": "NOVA", "area": "CRATO", "dur": "3:18", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.23011004,-39.40756563", "obs": "."}, {"id": "0041325451", "est": "NOVA", "area": "MILAGRES", "dur": "3:08", "cli": "414", "av": "1", "tipo": "TENS\u00c3O BAIXA/ALTA", "vtr": "MLS-EN-01C", "gps": "-7.48586389,-39.00128701", "obs": "CLIENTE INFORMA QUE A TENSAO ESTA ALTA QUEIMANDO TODOS OS EQUIPAMENTOS, JA CHAMOU ELETRICISTA PARTICULAR E ELE PEDIU PARA ELA VIR ABRI EMERGENCIAL /PROX A MERCANTIL POPULAR / PROCURA ZE MIUDO TEL 88993783070"}, {"id": "0041325493", "est": "NOVA", "area": "CRATO", "dur": "3:03", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.17833257,-39.38677873", "obs": "clt informa que sua energia caiu de forma repentina e ate agora nao voltou, clt fez as verificacoes internas mas nada foi resolvido"}, {"id": "0041325509", "est": "NOVA", "area": "JUAZEIRO", "dur": "3:02", "cli": "1", "av": "1", "tipo": "VEGETACAO SOBRE A REDE", "vtr": "", "gps": "-7.32149787,-39.3543485", "obs": "CLT RELATA ARVORE SOB FIA\u00c7AO OCASIONANDO QUEDA NA SUA ENERGIA REF DEPOIS DO CAMPO DE FUTEBOL TEL88981169242"}, {"id": "0041325571", "est": "NOVA", "area": "MILAGRES", "dur": "2:55", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.58965372,-39.20072201", "obs": "energia n\u00e3o foi restabelecida apos pedido de religa\u00e7\u00e3o, em sistema consta instala\u00e7\u00e3o n\u00e3o suspensa, cliente solicita equipe para resolu\u00e7\u00e3o do problema, ref prox a igreja"}, {"id": "0041325587", "est": "NOVA", "area": "JUAZEIRO", "dur": "2:54", "cli": "0", "av": "1", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "", "gps": "-7.02018137,-39.29357134", "obs": "fia\u00e7\u00e3o partida devido aos galhos de uma \u00e1rvore. tel: 11992015834"}, {"id": "0041325659", "est": "NOVA", "area": "MILAGRES", "dur": "2:45", "cli": "3", "av": "3", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.05306222,-38.95104969", "obs": "CLIENTE SEM ENERGIA GERAL FICA SEM ENERGIA COM FREQUENCIA POR CONTA DAS 3 CANELA DO POSTE QUE CAIU"}, {"id": "0041325685", "est": "NOVA", "area": "C. SALES", "dur": "2:42", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPA-RD-13D", "gps": "-6.88316168,-39.87344184", "obs": "CLT ELDO DA SILVA SOL EQUIPE NO LOCAL COM URGENCIA POIS RELATA FALTA DE ENERGIA POIS SEU DISJUNTOR PRECISA SER TROCADO x JA COMPROU UM NOVO x REF ENTRADA QUE VAI PRO CANOAS TEL 88996882070"}, {"id": "0041325689", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:41", "cli": "1", "av": "2", "tipo": "POSTE ABALRROADO", "vtr": "MLM-RD-14C", "gps": "-7.38355851,-38.76698706", "obs": "CLT INFORMA QUE UM CARRO DESGORVENADO BATEU NO POSTE EM FRENTE A SUA CASA E O POSTE EST\u00c1 PENSO PARA O LADO DA SUA CASA. SOL EQUIPE COM URGENCIA NO LOCAL PX A CI\u00c7A REBOLAR TEL 88998361113"}, {"id": "0041325707", "est": "RECEBIDA", "area": "MILAGRES", "dur": "2:39", "cli": "1", "av": "1", "tipo": "POSTE ABALRROADO", "vtr": "MLM-RD-14C", "gps": "-7.38392096,-38.7681739", "obs": "INFORMA QUE FIAT UNO BATEU EM POSTE, CARRO AIND ANO LOCAL, SEM VITIMAS, SOMENTE DANOS MATERIAIS. POSTE QUEBRAOD COM RISCO DE QUEDA. NAS CASAS DE MISSO RUA DO COELHAO SUBINDO DIRETO PROCURAR L\u00ca OU PEDREIROS"}, {"id": "0041325743", "est": "NOVA", "area": "C. SALES", "dur": "2:34", "cli": "0", "av": "2", "tipo": "CONDUTOR (FIO) PARTIDO", "vtr": "", "gps": "-6.952414,-39.54448605", "obs": "CLIENTE INFORMA QUE UM FIO FOI PARTIDO PELO UM CAMINH\u00c3O QUE PASSOU NO LOCAL, O FIO PARTIDO FOI DE ALTA TENS\u00c3O, O FIO EST\u00c1 ENTRE UMA CASA DE UM IDOSO E A CASA DE UM CADEIRANTES  REF - NA ENTRADA DOS CARAIS  CTT"}, {"id": "0041325923", "est": "NOVA", "area": "C. SALES", "dur": "2:18", "cli": "202", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "CPA-RD-13D", "gps": "-6.59434106,-40.31928296", "obs": "."}, {"id": "0041325951", "est": "NOVA", "area": "MILAGRES", "dur": "2:15", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.35787524,-38.74592509", "obs": "."}, {"id": "0041325963", "est": "NOVA", "area": "JUAZEIRO", "dur": "2:14", "cli": "0", "av": "1", "tipo": "VERIFICAR CHOQUE", "vtr": "", "gps": "-7.21077507,-39.32247811", "obs": "cliente informa que o fio est\u00e1 partido"}, {"id": "0041325977", "est": "NOVA", "area": "C. SALES", "dur": "2:13", "cli": "1", "av": "1", "tipo": "POSTE DANIFICADO", "vtr": "", "gps": "-7.1373973,-39.65449656", "obs": "CLIENTE INFORMA QUE NO LOCAL TEM POSTE DE FIBRA E QUE TEM MUITAS ABELHAS DENTRO POIS ELE \u00c9 OCO, PRECISA QUE A EQP V\u00c1 NO LOCAL POIS TEM Q CORTAR A ENERGIA PARA RETIRAR OS INSETOS"}, {"id": "0041325979", "est": "NOVA", "area": "JUAZEIRO", "dur": "2:13", "cli": "1", "av": "1", "tipo": "OSCILACAO", "vtr": "", "gps": "-7.2031991,-39.31622299", "obs": ""}, {"id": "0041326049", "est": "NOVA", "area": "MILAGRES", "dur": "2:04", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLS-EN-01C", "gps": "-7.48227269,-39.00509364", "obs": "."}, {"id": "0041326071", "est": "NOVA", "area": "JUAZEIRO", "dur": "2:02", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.28604111,-39.32729682", "obs": "Cliente reclama de falta de energia apenas na uc. Contato 11990102966"}, {"id": "0041326077", "est": "NOVA", "area": "MILAGRES", "dur": "2:02", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "MLS-EN-01C", "gps": "-7.53648385,-39.01009789", "obs": "CLIENTE INFORMA QUE CONTINUA SEM FORNECIMENTO PEDE EQUIPE NO LOCAL / EM FRENTE A CAPELA NOSSA SRA DE FATIMA / PROCURA POR KILVIA TEL 88997055675"}, {"id": "0041326147", "est": "NOVA", "area": "MILAGRES", "dur": "1:54", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-6.92166999,-38.89706652", "obs": "cliente relata que desde ontem esta sem energia e sua residencia e em algumas casas informa tbm que a equipe nao chegou \u00bfpara fazer o reparo e ela conmtinua sem energia"}, {"id": "0041326193", "est": "RECEBIDA", "area": "JUAZEIRO", "dur": "1:48", "cli": "0", "av": "2", "tipo": "INC\u00caNDIO", "vtr": "JZB-LB-24B", "gps": "-7.30378528,-39.29290118", "obs": "cliente informa que medidor carbonizou apos entrar em chamas."}, {"id": "0041326283", "est": "NOVA", "area": "MILAGRES", "dur": "1:37", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": "", "gps": "-7.25470833,-38.62775887", "obs": "Cliente informa que na obra, o medidor caiu e est\u00e1 danificado, cliente pede para fazer a retirada do mesmo"}, {"id": "0041326299", "est": "RECEBIDA", "area": "MILAGRES", "dur": "1:35", "cli": "0", "av": "1", "tipo": "OUTROS", "vtr": "MLM-RD-14C", "gps": "", "obs": "CLT INF OSCILA\u00c7\u00c3O NA SUA UC. SOL EQUIPE PARA VERIFICAR."}, {"id": "0041326309", "est": "NOVA", "area": "MILAGRES", "dur": "1:32", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.32312755,-39.04559979", "obs": "FALTA DE ENERGIA NESSA REGI\u00c3O E AFETA 6 CASAS."}, {"id": "0041326357", "est": "NOVA", "area": "MILAGRES", "dur": "1:25", "cli": "20", "av": "2", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.08335215,-38.74336167", "obs": ""}, {"id": "0041326429", "est": "NOVA", "area": "CRATO", "dur": "1:13", "cli": "0", "av": "1", "tipo": "PERIGO IMINENTE", "vtr": "", "gps": "-7.21989486,-39.41050935", "obs": "clt info que os fios est\u00e3o muito enrolados correndo risco de inc\u00eandio.  ctt:88994888524 ou 88992337108 px:na lateral escola Jos\u00e9 aldegundes"}, {"id": "0041326437", "est": "NOVA", "area": "JUAZEIRO", "dur": "1:12", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.19234597,-39.32659527", "obs": "Cliente informa falta de energia apenas em seu endere\u00e7o, ter\u00e1 um evento em sua casa e ela precisa da energia. Verifica\u00e7\u00f5es internas foram feitas"}, {"id": "0041326467", "est": "NOVA", "area": "MILAGRES", "dur": "1:09", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.07224151,-38.90487531", "obs": "."}, {"id": "0041326615", "est": "NOVA", "area": "MILAGRES", "dur": "0:48", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.31518701,-38.81790332", "obs": "cliente  informa  falta     de  energia  s\u00f3 no  sitio"}, {"id": "0041326625", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:47", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "", "gps": "-7.30039306,-39.29300769", "obs": "cliente informa que a fia\u00e7\u00e3o foi rompida por caminh\u00e3o."}, {"id": "0041326723", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:36", "cli": "0", "av": "1", "tipo": "RELIGACAO ESPECIAL", "vtr": "", "gps": "", "obs": "cliente informa que no local religa\u00e7\u00e3o foi solicitada diversas vezes, equipes que v\u00e3o no local informaram que tampa estava com problema, tampa nova foi solicitada e agora equipes dizem que problema \u00e9 a caixa in"}, {"id": "0041326729", "est": "NOVA", "area": "MILAGRES", "dur": "0:35", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA NO CONSUMIDOR", "vtr": "", "gps": "-7.39929754,-38.825064", "obs": "."}, {"id": "0041326813", "est": "NOVA", "area": "MILAGRES", "dur": "0:25", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.27773718,-38.97621947", "obs": "."}, {"id": "0041326841", "est": "NOVA", "area": "C. SALES", "dur": "0:22", "cli": "1", "av": "1", "tipo": "FALTA DE ENERGIA EM VARIOS CONSUMIDORES", "vtr": "", "gps": "-7.21291149,-40.13680014", "obs": "cliente esta informando que esta sem nergia desde 16h e ate agr nao volto"}, {"id": "0041326847", "est": "NOVA", "area": "JUAZEIRO", "dur": "0:20", "cli": "0", "av": "1", "tipo": "RAMAL DE LIGACAO QUEBRADO", "vtr": "", "gps": "-7.25644546,-39.31169445", "obs": "clt informa que a fia\u00e7\u00e3o dela esta partida no ch\u00e3o"}, {"id": "0041326925", "est": "NOVA", "area": "MILAGRES", "dur": "0:06", "cli": "1", "av": "1", "tipo": "TENS\u00c3O BAIXA/ALTA", "vtr": "", "gps": "-7.39588695,-38.82422261", "obs": "cliente informa que no local desde as 3 da manh\u00e3 energia est\u00e1 muito fraca em v\u00e1rias casas"}, {"id": "0041326931", "est": "NOVA", "area": "MILAGRES", "dur": "0:06", "cli": "1", "av": "1", "tipo": "VEGETACAO SOBRE A REDE", "vtr": "", "gps": "-7.44881915,-38.7277659", "obs": "cliente esta informando que tem um pe de manga na frente da casa dela que esta topando na fiacao e esta causando oscilacao"}];
 
 // durMin movida para cima
 
@@ -306,8 +351,6 @@ function toggleTheme(){
     document.getElementById('theme-label').textContent='Escuro';
   }
 })();
-
-renderTudo();
 </script>
 
 <script>
@@ -316,6 +359,94 @@ const DADOS_URL = 'https://igorbezerra9-svg.github.io/Painel-Ocorr-ncias-Cosampa
 let ultimoAtualizado = null;
 
 // vtrTag movida para cima
+
+function vtrTag(v, small=false){
+  if(!v) return '<span style="font-size:10.5px;color:var(--orange)">⚠ sem equipe</span>';
+  const p=COSAMPA_PROC[v];
+  const cls=p==='em'?'vtr-em':p==='co'?'vtr-co':p==='ml'?'vtr-ml':'vtr-el';
+  const title=p==='em'?'Cosampa Emergencial':p==='co'?'Cosampa Comercial':p==='ml'?'Cosampa Manutencao':'Enel / não identificada';
+  const sz=small?'font-size:9.5px;padding:1px 6px;':'';
+  return `<span class="vtr ${cls}" style="${sz}" title="${title}">${v}</span>`;
+}
+
+// ── Mapa de Incidências ────────────────────────────────────────────
+let map = null;
+let mapMarkers = [];
+const SUL_CENTER = [-7.25, -39.3];
+const SUL_ZOOM = 9;
+
+function switchView(view){
+  document.getElementById('tab-painel').classList.toggle('on', view==='painel');
+  document.getElementById('tab-mapa').classList.toggle('on', view==='mapa');
+  document.getElementById('view-painel').style.display = view==='painel' ? '' : 'none';
+  document.getElementById('view-mapa').style.display = view==='mapa' ? '' : 'none';
+  if(view==='mapa'){
+    if(!map) initMap();
+    setTimeout(()=>{ if(map) map.invalidateSize(); }, 50);
+    if(window._dadosAtuais) renderMapMarkers(window._dadosAtuais);
+  }
+}
+
+function initMap(){
+  map = L.map('map').setView(SUL_CENTER, SUL_ZOOM);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap',
+    maxZoom: 19
+  }).addTo(map);
+}
+
+// Gera uma cor consistente (HSL) a partir do código da viatura
+function corViatura(vtr){
+  let hash = 0;
+  for(let i=0; i<vtr.length; i++){
+    hash = vtr.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 70%, 50%)`;
+}
+
+function carIconHtml(vtr){
+  const cor = corViatura(vtr);
+  return `<div class="div-icon-car" style="background:${cor}">🚗</div>`;
+}
+
+function renderMapMarkers(dados){
+  if(!map) return;
+  mapMarkers.forEach(m => map.removeLayer(m));
+  mapMarkers = [];
+
+  dados.forEach(d => {
+    if(!d.gps) return;
+    const parts = d.gps.split(',');
+    if(parts.length < 2) return;
+    const lat = parseFloat(parts[0]);
+    const lng = parseFloat(parts[1]);
+    if(isNaN(lat) || isNaN(lng)) return;
+
+    let icon;
+    if(d.vtr){
+      icon = L.divIcon({ html: carIconHtml(d.vtr), className:'', iconSize:[30,30], iconAnchor:[15,15] });
+    } else {
+      icon = L.divIcon({ html: '<div class="div-icon-pin">📍</div>', className:'', iconSize:[28,28], iconAnchor:[14,28] });
+    }
+
+    const urg = URGENTES.includes(d.tipo);
+    const popup = `<div class="map-popup">
+        <div class="mp-id">${d.id}</div>
+        <div class="mp-row"><span>Estado</span><b>${d.est}</b></div>
+        <div class="mp-row"><span>Área</span><b>${d.area}</b></div>
+        <div class="mp-row"><span>Duração</span><b>${d.dur}</b></div>
+        <div class="mp-row"><span>Clientes</span><b>${d.cli}</b></div>
+        <div class="mp-row"><span>Viatura</span><b>${d.vtr || 'sem equipe'}</b></div>
+        <div class="mp-tipo ${urg?'mp-urg':''}">${urg?'⚠ ':''}${d.tipo}</div>
+        ${d.obs ? `<div class="mp-obs">💬 ${d.obs}</div>` : ''}
+      </div>`;
+
+    const marker = L.marker([lat,lng], {icon}).addTo(map).bindPopup(popup);
+    if(d.vtr) marker.bindTooltip(d.vtr, {direction:'top', offset:[0,-12]});
+    mapMarkers.push(marker);
+  });
+}
 
 function atualizarPainel(payload){
   const dados = payload.dados;
@@ -386,14 +517,6 @@ function atualizarPainel(payload){
     const eids=items[2].querySelector('.eq-enel-ids');
     if(eids) eids.textContent=elIds;
   }
-function vtrTag(v, small=false){
-  if(!v) return '<span style="font-size:10.5px;color:var(--orange)">⚠ sem equipe</span>';
-  const p=COSAMPA_PROC[v];
-  const cls=p==='em'?'vtr-em':p==='co'?'vtr-co':p==='ml'?'vtr-ml':'vtr-el';
-  const title=p==='em'?'Cosampa Emergencial':p==='co'?'Cosampa Comercial':p==='ml'?'Cosampa Manutencao':'Enel / não identificada';
-  const sz=small?'font-size:9.5px;padding:1px 6px;':'';
-  return `<span class="vtr ${cls}" style="${sz}" title="${title}">${v}</span>`;
-}
 
   document.querySelector('.vtr-row').innerHTML=vtrs.map(v=>vtrTag(v)).join('\n');
 
@@ -482,6 +605,7 @@ function renderTudo(){
 
   window._dadosAtuais = dados;
   renderTabelaLive(filtroAtivo);
+  if(map) renderMapMarkers(dados);
 }
 
 function renderTabelaLive(area){
@@ -552,6 +676,7 @@ async function buscarDados(){
 }
 
 // Busca imediatamente e depois a cada 30 segundos
+renderTudo();
 buscarDados();
 setInterval(buscarDados, 30000);
 </script>
