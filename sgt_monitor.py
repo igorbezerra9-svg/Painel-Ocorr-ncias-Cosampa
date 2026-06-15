@@ -61,12 +61,13 @@ def iniciar_driver():
     opts.add_argument("--no-sandbox")
     opts.add_argument("--disable-dev-shm-usage")
     opts.add_argument("--disable-gpu")
-    # Headless no servidor Linux; comentar para rodar com janela no Windows
-    if os.environ.get("SGT_HEADLESS", "0") == "1" or not os.environ.get("DISPLAY"):
-        opts.add_argument("--headless=new")
-        print("[i] Modo headless ativado")
-    else:
-        opts.add_argument("--start-maximized")
+    # Headless com flags de compatibilidade Windows e Linux
+    opts.add_argument("--headless=new")
+    opts.add_argument("--no-sandbox")
+    opts.add_argument("--disable-dev-shm-usage")
+    opts.add_argument("--remote-debugging-port=0")
+    opts.add_argument("--window-size=1920,1080")
+    print("[i] Modo headless ativado")
     # Chromium no Linux (servidor) ou Chrome no Windows
     chromium = "/usr/bin/chromium-browser"
     if os.path.exists(chromium):
@@ -436,7 +437,6 @@ def salvar_painel(incidencias):
         dados_json = json.dumps(dados, ensure_ascii=True)
 
         # Substitui const dados=[...];
-        # Usa re.sub seguro — escapa backslashes no replacement
         novo_html = re.sub(
             r"const dados\s*=\s*\[.*?\]\s*;",
             lambda m: "const dados=" + dados_json + ";",
