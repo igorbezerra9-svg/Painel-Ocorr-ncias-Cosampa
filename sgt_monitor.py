@@ -27,7 +27,7 @@ except ImportError:
 # ─── CONFIGURAÇÃO ────────────────────────────────────────────────
 USUARIO           = "BR0894369203"
 SENHA             = "none"
-INTERVALO_MINUTOS = 2
+INTERVALO_MINUTOS = 1
 URL_LOGIN         = "https://temporealce.enel.com/sgt/"
 PASTA_SAIDA       = os.path.dirname(os.path.abspath(__file__))
 # ─────────────────────────────────────────────────────────────────
@@ -372,9 +372,10 @@ def salvar_painel(incidencias):
         dados_json = json.dumps(dados, ensure_ascii=False)
 
         # Substitui const dados=[...];
+        # Usa re.sub seguro — escapa backslashes no replacement
         novo_html = re.sub(
             r"const dados\s*=\s*\[.*?\]\s*;",
-            "const dados=" + dados_json + ";",
+            lambda m: "const dados=" + dados_json + ";",
             html, flags=re.DOTALL
         )
         if novo_html == html:
